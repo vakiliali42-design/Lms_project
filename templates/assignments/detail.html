@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}{{ assignment.title }}{% endblock %}
+
+{% block content %}
+<div class="card p-4 mb-4">
+  <h4>{{ assignment.title }}</h4>
+  <p>{{ assignment.description }}</p>
+  <span class="badge bg-secondary">
+    مهلت: {{ assignment.due_date|date:"Y/m/d H:i" }}
+  </span>
+</div>
+
+<!-- ارسال دانشجو -->
+{% if request.user.role == 'student' %}
+  {% if my_submission %}
+  <div class="alert alert-success">
+    <i class="bi bi-check-circle"></i> تکلیف ارسال شده —
+    وضعیت: {{ my_submission.get_status_display }}
+    {% if my_submission.score %}
+     — نمره: <strong>{{ my_submission.score }}</strong>
+    {% endif %}
+    {% if my_submission.feedback %}
+    <p class="mt-2">بازخورد استاد: {{ my_submission.feedback }}</p>
+    {% endif %}
+  </div>
+  {% else %}
+  <a href="{% url 'submit_assignment' assignment.pk %}"
+     class="btn btn-primary">
+    <i class="bi bi-upload"></i> ارسال تکلیف
+  </a>
+  {% endif %}
+
+<!-- لیست ارسال‌ها برای استاد -->
+{% elif request.user.role == 'teacher' or request.user.role == 'admin' %}
+<h5 class="mb-3">ارسال‌های دانشجویان</h5>
+{% for sub in submissions %}
+<div class="card mb-2 p-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <strong>{{ sub.student.get_full_name }}</strong>
+      <span class="badge
+        {% if sub.status == 'graded' %}bg-success
+        {% elif sub.status == 'late' %}bg-danger
+        {% else %}bg-warning text-dark{% endif %} ms-2">
+        {{ sub.get_status_display }}
+      </span>
+      {% if sub.score %}
+      <span class="ms-2">نمره: {{ sub.score }}</span>
+      {% endif %}
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ sub.file.url }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-download"></i> فایل
+      </a>
+      <a href="{% url 'grade_submission' sub.pk %}"
+         class="btn btn-sm btn-success">
+        <i class="bi bi-pencil"></i> نمره‌دهی
+      </a>
+    </div>
+  </div>
+</div>
+{% empty %}
+<p class="text-muted">هنوز ارسالی نشده.</p>
+{% endfor %}
+{% endif %}
+{% endblock %}

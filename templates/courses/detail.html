@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Main -->
+  <div class="col-md-8">
+    <div class="card p-4 mb-4">
+      <h3>{{ course.title }}</h3>
+      <p class="text-muted">
+        <i class="bi bi-person"></i> {{ course.teacher.get_full_name }} &nbsp;|&nbsp;
+        <span class="badge bg-secondary">{{ course.get_level_display }}</span>
+      </p>
+      <p>{{ course.description }}</p>
+
+      <!-- اکشن‌ها -->
+      <div class="d-flex gap-2 flex-wrap">
+        {% if not request.user.is_authenticated %}
+          <a href="{% url 'login' %}" class="btn btn-primary">ورود برای ثبت‌نام</a>
+        {% elif request.user.role == 'student' %}
+          {% if enrolled %}
+            <span class="btn btn-success disabled">
+              <i class="bi bi-check-lg"></i> ثبت‌نام شده‌اید
+            </span>
+            <a href="{% url 'upload_content' course.slug %}"
+               class="btn btn-outline-primary">
+              <i class="bi bi-upload"></i> آپلود محتوا
+            </a>
+            <a href="{% url 'assignment_list' course.slug %}"
+               class="btn btn-outline-secondary">
+              <i class="bi bi-clipboard"></i> تکالیف
+            </a>
+          {% else %}
+            <a href="{% url 'enroll_course' course.slug %}"
+               class="btn btn-primary">
+              <i class="bi bi-person-check"></i> ثبت‌نام در دوره
+            </a>
+          {% endif %}
+        {% elif request.user == course.teacher or request.user.role == 'admin' %}
+          <a href="{% url 'add_lesson' course.slug %}"
+             class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> جلسه جدید
+          </a>
+          <a href="{% url 'create_assignment' course.slug %}"
+             class="btn btn-outline-primary">
+            <i class="bi bi-clipboard-plus"></i> تکلیف جدید
+          </a>
+          <a href="{% url 'edit_course' course.slug %}"
+             class="btn btn-outline-secondary">
+            <i class="bi bi-pencil"></i> ویرایش
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- جلسات -->
+    <div class="card p-4">
+      <h5><i class="bi bi-play-circle text-primary"></i> جلسات دوره</h5>
+      <hr>
+      {% for lesson in lessons %}
+      <div class="d-flex align-items-start py-3 border-bottom">
+        <span class="badge bg-primary ms-3">{{ lesson.order }}</span>
+        <div>
+          <strong>{{ lesson.title }}</strong>
+          {% if enrolled or request.user == course.teacher %}
+          <p class="text-muted small mb-1">{{ lesson.content|truncatechars:100 }}</p>
+          {% if lesson.video_url %}
+          <a href="{{ lesson.video_url }}" target="_blank"
+             class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-youtube"></i> ویدیو
+          </a>
+          {% endif %}
+          {% if lesson.file %}
+          <a href="{{ lesson.file.url }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-download"></i> دانلود
+          </a>
+          {% endif %}
+          {% else %}
+          <p class="text-muted small">برای مشاهده ثبت‌نام کنید.</p>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted">جلسه‌ای اضافه نشده.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-md-4">
+    <div class="card p-3 mb-3">
+      <h6>اطلاعات دوره</h6>
+      <hr>
+      <p><i class="bi bi-bar-chart"></i> سطح: {{ course.get_level_display }}</p>
+      <p><i class="bi bi-book"></i> جلسات: {{ lessons.count }}</p>
+      <p><i class="bi bi-people"></i>
+        دانشجویان: {{ course.students.count }}</p>
+      {% if course.price > 0 %}
+      <p><i class="bi bi-currency-dollar"></i>
+        قیمت: {{ course.price }} تومان</p>
+      {% else %}
+      <span class="badge bg-success">رایگان</span>
+      {% endif %}
+    </div>
+
+
+    <!-- فایل‌های دانشجو -->
+    {% if enrolled and student_contents %}
+    <div class="card p-3">
+      <h6><i class="bi bi-folder"></i> فایل‌های آپلودی من</h6>
+      <hr>
+      {% for c in student_contents %}
+      <div class="d-flex justify-content-between py-1">
+        <span class="small">{{ c.title }}</span>
+        <a href="{{ c.file.url }}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-download"></i>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+<!-- بخش نظرات — اضافه کن به detail.html -->
+<div class="card p-4 mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">
+      <i class="bi bi-star-fill text-warning"></i>
+      نظرات دانشجویان
+      <span class="badge bg-secondary ms-2">{{ course.review_count }}</span>
+    </h5>
+
+    <!-- میانگین امتیاز -->
+    {% if course.average_score > 0 %}
+    <div class="text-center">
+      <span class="fw-bold fs-4 text-warning">{{ course.average_score }}</span>
+      <span class="text-muted">/5</span>
+      <div class="text-warning small">
+        {% for i in "12345" %}
+          {% if forloop.counter <= course.average_score %}★{% else %}☆{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- دکمه ثبت نظر -->
+  {% if request.user.is_authenticated and enrolled %}
+    {% if not user_review %}
+    <a href="{% url 'add_review' course.slug %}"
+       class="btn btn-outline-warning btn-sm mb-3">
+      <i class="bi bi-star"></i> ثبت نظر
+    </a>
+    {% else %}
+    <div class="alert alert-info py-2 small mb-3">
+      شما قبلاً نظر داده‌اید.
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <!-- لیست نظرات -->
+  {% for review in reviews %}
+  <div class="border-bottom py-3">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <strong>{{ review.student.get_full_name|default:review.student.username }}</strong>
+        <span class="text-warning ms-2">
+          {% for i in "12345" %}
+            {% if forloop.counter <= review.score %}★{% else %}☆{% endif %}
+          {% endfor %}
+        </span>
+        <p class="text-muted small mb-1 mt-1">{{ review.comment }}</p>
+        <small class="text-muted">
+          {{ review.created_at|timesince }} پیش
+        </small>
+      </div>
+
+      {% if request.user == review.student or request.user.role == 'admin' %}
+      <a href="{% url 'delete_review' course.slug review.pk %}"
+         class="btn btn-sm btn-outline-danger"
+         onclick="return confirm('حذف شود؟')">
+        <i class="bi bi-trash"></i>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted text-center py-3">
+    هنوز نظری ثبت نشده.
+  </p>
+  {% endfor %}
+</div>
+{% endblock %}

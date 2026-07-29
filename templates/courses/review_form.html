@@ -1,0 +1,67 @@
+<!-- templates/courses/review_form.html -->
+{% extends 'base.html' %}
+{% block title %}ثبت نظر{% endblock %}
+
+{% block extra_css %}
+<style>
+.star-radio { display: none; }
+.star-label {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  transition: color .2s;
+}
+.star-label:hover,
+.star-label:hover ~ .star-label,
+input[type=radio]:checked ~ .star-label {
+  color: #ffc107;
+}
+.stars { display: flex; flex-direction: row-reverse; gap: .3rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h4 class="mb-1">
+        <i class="bi bi-star text-warning"></i> ثبت نظر
+      </h4>
+      <p class="text-muted small mb-4">دوره: {{ course.title }}</p>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- ستاره‌ها -->
+        <div class="mb-4">
+          <label class="form-label fw-bold">امتیاز شما</label>
+          <div class="stars">
+            {% for val, label in form.score.field.choices %}
+            <label class="star-label" title="{{ label }}">
+              ★
+              <input type="radio" name="score"
+                     value="{{ val }}" class="star-radio"
+                     {% if form.score.value == val|stringformat:'s' %}checked{% endif %}>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- نظر -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">نظر شما</label>
+          {{ form.comment }}
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-send"></i> ثبت نظر
+          </button>
+          <a href="{% url 'course_detail' course.slug %}"
+             class="btn btn-outline-secondary">انصراف</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

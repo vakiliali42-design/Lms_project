@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}پنل ادمین{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4><i class="bi bi-shield-check text-danger"></i> پنل مدیریت</h4>
+</div>
+
+<!-- آمار کلی -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card p-3 text-center stat-card">
+      <i class="bi bi-people fs-1"></i>
+      <h2>{{ total_users }}</h2>
+      <p class="mb-0">کاربر کل</p>
+      <small>{{ total_students }} دانشجو | {{ total_teachers }} استاد</small>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center stat-card green">
+      <i class="bi bi-collection fs-1"></i>
+      <h2>{{ total_courses }}</h2>
+      <p class="mb-0">دوره کل</p>
+      <small>{{ published_courses }} منتشرشده</small>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center stat-card orange">
+      <i class="bi bi-clipboard-check fs-1"></i>
+      <h2>{{ total_submissions }}</h2>
+      <p class="mb-0">ارسال تکلیف</p>
+      <small>{{ graded }} نمره‌دهی | {{ pending }} در انتظار</small>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center stat-card"
+         style="background:linear-gradient(135deg,#6B1E1E,#991b1b);">
+      <i class="bi bi-bell fs-1"></i>
+      <h2>{{ total_notifs }}</h2>
+      <p class="mb-0">اعلان کل</p>
+      <small>{{ unread_notifs }} خوانده‌نشده</small>
+    </div>
+  </div>
+</div>
+
+<!-- لینک‌های سریع -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <a href="{% url 'admin_user_list' %}" class="card p-3 text-decoration-none">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-people-fill fs-2 text-primary"></i>
+        <div>
+          <h6 class="mb-0">مدیریت کاربران</h6>
+          <small class="text-muted">لیست — ایجاد — ویرایش — حذف</small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'admin_course_list' %}" class="card p-3 text-decoration-none">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-collection-fill fs-2 text-success"></i>
+        <div>
+          <h6 class="mb-0">مدیریت دوره‌ها</h6>
+          <small class="text-muted">انتشار — ویرایش — حذف</small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'admin_assignment_list' %}" class="card p-3 text-decoration-none">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-clipboard-fill fs-2 text-warning"></i>
+        <div>
+          <h6 class="mb-0">مدیریت تکالیف</h6>
+          <small class="text-muted">تکالیف — ارسال‌ها — نمرات</small>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- کاربران اخیر -->
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="mb-3">
+        <i class="bi bi-person-plus text-primary"></i> کاربران اخیر
+      </h6>
+      {% for u in recent_users %}
+      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <span>{{ u.get_full_name|default:u.username }}</span>
+        <div class="d-flex gap-2 align-items-center">
+          <span class="badge badge-{{ u.role }}">{{ u.get_role_display }}</span>
+          <a href="{% url 'admin_user_edit' u.pk %}"
+             class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+      <a href="{% url 'admin_user_list' %}"
+         class="btn btn-outline-primary btn-sm mt-3 w-100">
+        مشاهده همه
+      </a>
+    </div>
+  </div>
+
+  <!-- دوره‌های اخیر -->
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h6 class="mb-3">
+        <i class="bi bi-collection text-success"></i> دوره‌های اخیر
+      </h6>
+      {% for course in recent_courses %}
+<div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <span>{{ course.title }}</span>
+        <div class="d-flex gap-2 align-items-center">
+          {% if course.is_published %}
+          <span class="badge bg-success">منتشر</span>
+          {% else %}
+          <span class="badge bg-secondary">پیش‌نویس</span>
+          {% endif %}
+          <a href="{% url 'admin_course_edit' course.pk %}"
+             class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+      <a href="{% url 'admin_course_list' %}"
+         class="btn btn-outline-success btn-sm mt-3 w-100">
+        مشاهده همه
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
