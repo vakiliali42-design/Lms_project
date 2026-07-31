@@ -11,4 +11,7 @@ urlpatterns = [
     path("<slug:slug>/review/", views.add_review, name="add_review"),
     path("<slug:slug>/review/<int:pk>/remove/", views.remove_review, name="delete_review"),
     path("edit/<slug:slug>/", views.edit_course, name="edit_course"),
+    path("<slug:slug>/students/", views.course_students, name="course_students"),
+    path("lesson/<int:pk>/edit/", views.edit_lesson, name="edit_lesson"),
+    path("lesson/<int:pk>/delete/", views.delete_lesson, name="delete_lesson"),
 ]

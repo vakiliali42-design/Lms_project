@@ -1,45 +1,614 @@
+<!-- templates/home.html -->
 {% extends 'base.html' %}
-{% block title %}خانه{% endblock %}
+{% block title %}خانه — سامانه آموزش آنلاین{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Hero ─────────────────────────────────────────────── */
+.hero-section {
+  min-height: 520px;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(46,117,182,.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(91,163,217,.25) 0%, transparent 50%),
+    linear-gradient(135deg, #0d1b2a 0%, #1a2f4a 50%, #0f2035 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 2rem;
+  margin-bottom: 0;
+}
+
+/* ستاره‌های پس‌زمینه */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 10%, rgba(255,255,255,.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 55%, rgba(255,255,255,.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 75% 25%, rgba(255,255,255,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 75%, rgba(255,255,255,.3) 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 10%, rgba(255,255,255,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 85%, rgba(255,255,255,.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 15% 60%, rgba(255,255,255,.3) 0%, transparent 100%);
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%   { opacity: .6; }
+  100% { opacity: 1; }
+}
+
+/* حلقه‌های تزئینی */
+.hero-section::after {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  border: 1px solid rgba(91,163,217,.15);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ringPulse 6s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: .4; }
+  50%       { transform: translate(-50%, -50%) scale(1.1); opacity: .1; }
+}
+
+.hero-content { position: relative; z-index: 2; }
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,215,0,.15);
+  border: 1px solid rgba(255,215,0,.4);
+  color: #FFD700;
+  padding: .3rem 1rem;
+  border-radius: 50px;
+  font-size: .8rem;
+  letter-spacing: 2px;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,.3);
+}
+
+.hero-title span {
+  background: linear-gradient(90deg, #5BA3D9, #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  color: rgba(255,255,255,.7);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-btn-primary {
+  background: linear-gradient(135deg, #2E75B6, #1F4E79);
+  color: white;
+  border: none;
+  padding: .8rem 2rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all .3s ease;
+  box-shadow: 0 8px 25px rgba(46,117,182,.5);
+  margin: .3rem;
+}
+
+.hero-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(46,117,182,.6);
+  color: white;
+}
+
+.hero-btn-secondary {
+  background: rgba(255,255,255,.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,.3);
+  padding: .8rem 2rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: all .3s ease;
+  backdrop-filter: blur(8px);
+  margin: .3rem;
+}
+
+.hero-btn-secondary:hover {
+  background: rgba(255,255,255,.2);
+  transform: translateY(-3px);
+  color: white;
+}
+ /* ── بخش کارت‌ها ─────────────────────────────────────── */
+.features-section {
+  background: linear-gradient(180deg, #0d1b2a 0%, #0f2035 40%, #f0f4f8 40%);
+  padding: 0 0 3rem 0;
+  margin: 0 -12px;
+  border-radius: 0 0 24px 24px;
+}
+
+.features-inner {
+  padding: 0 12px;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+/* کارت شیشه‌ای */
+.glass-card {
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all .4s cubic-bezier(.175,.885,.32,1.275);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.1) 0%,
+    transparent 50%,
+    rgba(255,255,255,.05) 100%);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.glass-card:hover::before { opacity: 1; }
+
+.glass-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  border-color: rgba(255,215,0,.4);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.3),
+    0 0 30px rgba(255,215,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+/* glow خاص هر کارت */
+.glass-card.card-blue:hover {
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.3),
+    0 0 40px rgba(46,117,182,.3);
+  border-color: rgba(91,163,217,.5);
+}
+
+.glass-card.card-gold:hover {
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.3),
+    0 0 40px rgba(255,215,0,.25);
+  border-color: rgba(255,215,0,.5);
+}
+
+.glass-card.card-green:hover {
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.3),
+    0 0 40px rgba(40,167,69,.25);
+  border-color: rgba(40,167,69,.4);
+}
+
+.card-icon-wrap {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+  position: relative;
+  transition: transform .3s ease;
+}
+
+.glass-card:hover .card-icon-wrap {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.icon-blue  { background: rgba(46,117,182,.25); color: #5BA3D9; border: 1px solid rgba(91,163,217,.3); }
+.icon-gold  { background: rgba(255,215,0,.15);  color: #FFD700; border: 1px solid rgba(255,215,0,.3);  }
+.icon-green { background: rgba(40,167,69,.2);   color: #5CB85C; border: 1px solid rgba(92,184,92,.3);  }
+
+.card-title {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: .6rem;
+}
+
+.card-desc {
+  color: rgba(255,255,255,.6);
+  font-size: .9rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: rgba(255,255,255,.5);
+  font-size: .85rem;
+  transition: all .3s ease;
+}
+
+.glass-card:hover .card-link { color: #FFD700; gap: .6rem; }
+
+/* ── آمار ─────────────────────────────────────────────── */
+.stats-section {
+  padding: 3rem 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,.06);
+  transition: all .3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(46,117,182,.15);
+}
+
+.stat-num {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1F4E79, #2E75B6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: .3rem;
+}
+
+.stat-label {
+  color: #718096;
+  font-size: .9rem;
+  font-weight: 500;
+}
+
+/* ── دوره‌های اخیر ────────────────────────────────────── */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1F4E79;
+  position: relative;
+  display: inline-block;
+  margin-bottom: .5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; right: 0;
+  width: 50%; height: 3px;
+  background: linear-gradient(90deg, #2E75B6, transparent);
+  border-radius: 2px;
+}
+
+.course-mini-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  transition: all .3s ease;
+  height: 100%;
+}
+.course-mini-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(46,117,182,.2);
+}
+
+.course-mini-thumb {
+  height: 150px;
+  background: linear-gradient(135deg, #1F4E79, #2E75B6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: rgba(255,255,255,.3);
+}
+
+/* ── CTA ──────────────────────────────────────────────── */
+.cta-section {
+  background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 50%, #1a3a5c 100%);
+  border-radius: 24px;
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+  top: -100px; right: -100px;
+}
+
+.cta-section::after {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+  bottom: -80px; left: -80px;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- Hero -->
-<div class="p-5 mb-4 bg-primary text-white rounded-3 text-center">
-  <h1 class="display-5 fw-bold">
-    <i class="bi bi-mortarboard-fill"></i> سامانه آموزش آنلاین
-  </h1>
-  <p class="lead">یادگیری را با بهترین اساتید تجربه کنید</p>
-  <a href="{% url 'course_list' %}" class="btn btn-light btn-lg ms-2">
-    <i class="bi bi-collection"></i> مشاهده دوره‌ها
-  </a>
-  {% if not request.user.is_authenticated %}
-  <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">
-    <i class="bi bi-person-plus"></i> ثبت‌نام رایگان
-  </a>
-  {% endif %}
+
+<!-- ── Hero ───────────────────────────────────────────── -->
+<div class="hero-section mb-0">
+  <div class="hero-content">
+    <div class="hero-badge">
+      ✦ پلتفرم آموزش آنلاین
+    </div>
+    <h1 class="hero-title">
+      یادگیری را با<br>
+      <span>بهترین اساتید</span><br>
+      تجربه کنید
+    </h1>
+    <p class="hero-sub">
+      بیش از {{ total_courses }} دوره تخصصی با اساتید مجرب —
+      از مبتدی تا پیشرفته
+    </p>
+    <div>
+      <a href="{% url 'course_list' %}" class="hero-btn-primary">
+        <i class="bi bi-collection-fill me-2"></i>مشاهده دوره‌ها
+      </a>
+      {% if not request.user.is_authenticated %}
+      <a href="{% url 'register' %}" class="hero-btn-secondary">
+        <i class="bi bi-person-plus me-2"></i>ثبت‌نام رایگان
+      </a>
+      {% else %}
+      <a href="{% url 'dashboard' %}" class="hero-btn-secondary">
+        <i class="bi bi-speedometer2 me-2"></i>داشبورد من
+      </a>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
-<!-- Stats -->
-<div class="row g-4 text-center mb-5">
-  <div class="col-md-4">
-    <div class="card p-4">
-      <i class="bi bi-collection fs-1 text-primary"></i>
-      <h3 class="mt-2">دوره‌های متنوع</h3>
-      <p class="text-muted">از مبتدی تا پیشرفته</p>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card p-4">
-      <i class="bi bi-people fs-1 text-success"></i>
-      <h3 class="mt-2">اساتید مجرب</h3>
-      <p class="text-muted">آموزش با کیفیت</p>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card p-4">
-      <i class="bi bi-award fs-1 text-warning"></i>
-      <h3 class="mt-2">گواهینامه معتبر</h3>
-      <p class="text-muted">پس از اتمام دوره</p>
+<!-- ── سه کارت شیشه‌ای ────────────────────────────────── -->
+<div class="features-section">
+  <div class="features-inner">
+    <div class="row g-4" style="padding-top: 2.5rem;">
+
+      <div class="col-md-4">
+        <a href="{% url 'course_list' %}" class="glass-card card-blue">
+          <div class="card-icon-wrap icon-blue">
+            <i class="bi bi-collection-play-fill"></i>
+          </div>
+          <div class="card-title">دوره‌های متنوع</div>
+          <div class="card-desc">
+            {{ total_courses }} دوره تخصصی از سطح مبتدی تا پیشرفته
+            در حوزه‌های مختلف
+          </div>
+          <div class="card-link">
+            مشاهده همه دوره‌ها
+            <i class="bi bi-arrow-left"></i>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-4">
+        <a href="{% url 'course_list' %}" class="glass-card card-gold">
+          <div class="card-icon-wrap icon-gold">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <div class="card-title">اساتید مجرب</div>
+          <div class="card-desc">
+            {{ total_teachers }} استاد متخصص با سال‌ها تجربه آموزشی
+            در کنار {{ total_students }} دانشجو
+          </div>
+          <div class="card-link">
+            شروع یادگیری
+            <i class="bi bi-arrow-left"></i>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-4">
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="glass-card card-green">
+        {% else %}
+        <a href="{% url 'register' %}" class="glass-card card-green">
+        {% endif %}
+          <div class="card-icon-wrap icon-green">
+            <i class="bi bi-patch-check-fill"></i>
+          </div>
+          <div class="card-title">گواهینامه معتبر</div>
+          <div class="card-desc">
+            پس از اتمام موفق دوره، گواهینامه معتبر دریافت کنید
+و مهارت خود را ثابت کنید
+          </div>
+          <div class="card-link">
+            {% if request.user.is_authenticated %}
+              داشبورد من
+            {% else %}
+              ثبت‌نام رایگان
+            {% endif %}
+            <i class="bi bi-arrow-left"></i>
+          </div>
+        </a>
+      </div>
+
     </div>
   </div>
 </div>
+
+<!-- ── آمار ───────────────────────────────────────────── -->
+<div class="stats-section">
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num">{{ total_courses }}</div>
+        <div class="stat-label">دوره فعال</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num">{{ total_teachers }}</div>
+        <div class="stat-label">استاد متخصص</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num">{{ total_students }}</div>
+        <div class="stat-label">دانشجو</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-item">
+        <div class="stat-num">{{ total_lessons }}</div>
+        <div class="stat-label">جلسه آموزشی</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── دوره‌های اخیر ──────────────────────────────────── -->
+{% if recent_courses %}
+<div class="mb-5">
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <h2 class="section-title">دوره‌های جدید</h2>
+      <p class="text-muted small mt-2">تازه‌ترین دوره‌های اضافه‌شده</p>
+    </div>
+    <a href="{% url 'course_list' %}"
+       class="btn btn-outline-primary btn-sm">
+      مشاهده همه <i class="bi bi-arrow-left ms-1"></i>
+    </a>
+  </div>
+
+  <div class="row g-4">
+    {% for course in recent_courses %}
+    <div class="col-md-4">
+      <div class="course-mini-card card">
+        {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}"
+             style="height:150px; object-fit:cover; width:100%;"
+             alt="{{ course.title }}">
+        {% else %}
+        <div class="course-mini-thumb">
+          <i class="bi bi-collection"></i>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <span class="badge bg-secondary mb-2">
+            {{ course.get_level_display }}
+          </span>
+          <h6 class="card-title fw-bold">{{ course.title }}</h6>
+          <p class="text-muted small">
+            <i class="bi bi-person"></i>
+            {{ course.teacher.get_full_name }}
+          </p>
+          <div class="d-flex justify-content-between align-items-center">
+            {% if course.price > 0 %}
+            <span class="text-primary fw-bold small">
+              {{ course.price }} تومان
+            </span>
+            {% else %}
+            <span class="badge bg-success">رایگان</span>
+            {% endif %}
+            <a href="{% url 'course_detail' course.slug %}"
+               class="btn btn-primary btn-sm">
+              مشاهده
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── CTA ────────────────────────────────────────────── -->
+{% if not request.user.is_authenticated %}
+<div class="cta-section mb-4">
+  <div style="position: relative; z-index: 2;">
+    <h2 style="color:white; font-size:2rem; font-weight:800; margin-bottom:1rem;">
+      آماده شروع هستید؟
+    </h2>
+    <p style="color:rgba(255,255,255,.7); margin-bottom:2rem; font-size:1.1rem;">
+      همین الان ثبت‌نام کنید و اولین دوره‌تان را شروع کنید
+    </p>
+    <a href="{% url 'register' %}" class="hero-btn-primary"
+       style="font-size:1.1rem; padding:1rem 2.5rem;">
+      <i class="bi bi-rocket-takeoff me-2"></i>
+      شروع رایگان
+    </a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+{% block extra_js %}
+<script>
+// انیمیشن شمارش آمار
+document.addEventListener('DOMContentLoaded', () => {
+  const nums = document.querySelectorAll('.stat-num');
+  nums.forEach(el => {
+    const target = parseInt(el.textContent) || 0;
+    if (target === 0) return;
+    let current = 0;
+    const step  = Math.ceil(target / 40);
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { el.textContent = target; clearInterval(timer); }
+      else el.textContent = current;
+    }, 30);
+  });
+
+  // کارت‌ها با تاخیر ظاهر بشن
+  document.querySelectorAll('.glass-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      card.style.transition = 'all .6s cubic-bezier(.175,.885,.32,1.275)';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 200 + i * 150);
+  });
+});
+</script>
 {% endblock %}

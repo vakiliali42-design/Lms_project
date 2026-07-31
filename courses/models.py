@@ -41,6 +41,7 @@ class Lesson(models.Model):
     file = models.FileField(upload_to="lessons/files/", blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_published = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['order']

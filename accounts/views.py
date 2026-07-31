@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm, ProfileUpdateForm
+from courses.models import Course, Lesson
+from accounts.models import User
 
 def register_view(request):
     form = RegisterForm(request.POST or None)
@@ -14,12 +16,14 @@ def register_view(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
-    form = LoginForm(request.POST or None)
+    form = LoginForm(request, data=request.POST or None)
+
     if form.is_valid():
         user = form.get_user()
         login(request, user)
         return redirect("dashboard")
-    return render(request, 'accounts/login.html' , {'form': form})
+
+    return render(request, 'accounts/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
@@ -37,3 +41,13 @@ def profile_view(request):
 @login_required
 def dashboard_view(request):
     return render(request, "accounts/dashboard.html")
+
+
+def home_view(request):
+    return render(request, "home.html" , {
+        'total_courses': Course.objects.filter(is_published=True).count(),
+        'total_teachers': User.objects.filter(role='teacher').count(),
+        'total_students': User.objects.filter(role='student').count(),
+        'total_lessons': Lesson.objects.filter(is_published=True).count(),
+        'recent_course': Course.objects.filter(is_published=True).order_by('-created_at')[:3],
+    })

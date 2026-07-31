@@ -18,9 +18,17 @@ class User(AbstractUser):
 
     def is_teacher(self):
         return self.role == "teacher"
-    
+
     def is_admin(self):
         return self.role == "admin"
-    
-    def __str__(self):
-        return f"{self.get_full_name()} ({self.get_role_display()})"
+
+def __str__(self):
+    full_name = self.get_full_name().strip()
+
+    if full_name:
+        return f"{full_name} ({self.get_role_display()})"
+
+    if self.username:
+        return f"{self.username} ({self.get_role_display()})"
+
+    return self.email

@@ -52,13 +52,16 @@ def create_course(request):
 
 @login_required
 def edit_course(request, slug):
-    if not request.user.is_teacher() and not request.user.is_admin():
-            messages.error(request, 'دسترسی ندارید.')
-            return redirect('course_detail')
-    
+    course = get_object_or_404(Course, slug=slug)
+
+    if request.user != course.teacher and not request.user.is_admin():
+        messages.error(request, "دسترسی ندارید.")
+        return redirect("course_detail", slug=slug)
+
     form = CourseForm(
         request.POST or None,
         request.FILES or None,
+        instance=course,
     )
 
     if form.is_valid():
@@ -66,16 +69,15 @@ def edit_course(request, slug):
         messages.success(request, "دوره ویرایش شد.")
         return redirect("course_detail", slug=slug)
 
-    return render (
-        redirect,
-        'courses/form.html',
+    return render(
+        request,
+        "courses/form.html",
         {
-            'form':form,
-            'title':"ویرایش دوره"
-        }
+            "form": form,
+            "title": "ویرایش دوره",
+        },
     )
 
-    
 
 @login_required
 def add_lesson(request, slug):
@@ -141,3 +143,61 @@ def remove_review(request, slug):
     review.delete()
     messages.success(request, 'نظر شما حذف شد.')
     return redirect('course_detail', slug=slug)
+
+
+@login_required
+def course_students(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+
+    # فقط استاد دوره یا ادمین
+    if not (request.user == course.teacher or request.user.is_admin()):
+        messages.error(request, 'دسترسی ندارید.')
+        return redirect('course_detail', slug=slug)
+
+    enrollments = Enrollment.objects.filter(
+        course=course
+    ).select_related('student')
+
+    return render(request, 'courses/students.html', {
+        'course':      course,
+        'enrollments': enrollments,
+    })
+
+@login_required
+def edit_lesson(request, pk):
+    lesson = get_object_or_404(Lesson, pk=pk)
+
+    if request.user != lesson.course.teacher and not request.user.is_admin():
+        messages.error(request, "دسترسی ندارید.")
+        return redirect("course_detail", slug=lesson.course.slug)
+
+    form = LessonForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=lesson
+    )
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, "جلسه ویرایش شد.")
+        return redirect("course_detail", slug=lesson.course.slug)
+
+    return render(request, "courses/form.html", {
+        "form": form,
+        "title": "ویرایش جلسه",
+    })
+
+
+@login_required
+def delete_lesson(request, pk):
+    lesson = get_object_or_404(Lesson, pk=pk)
+
+    if request.user != lesson.course.teacher and not request.user.is_admin():
+        messages.error(request, "دسترسی ندارید.")
+        return redirect("course_detail", slug=lesson.course.slug)
+
+    slug = lesson.course.slug
+    lesson.delete()
+
+    messages.success(request, "جلسه حذف شد.")
+    return redirect("course_detail", slug=slug)

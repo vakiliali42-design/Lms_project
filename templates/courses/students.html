@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}دانشجویان {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>
+    <i class="bi bi-people text-primary"></i>
+    دانشجویان — {{ course.title }}
+  </h4>
+  <a href="{% url 'course_detail' course.slug %}"
+     class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-right"></i> بازگشت
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>نام دانشجو</th>
+          <th>ایمیل</th>
+          <th>تاریخ ثبت‌نام</th>
+          <th>وضعیت</th>
+          <th>ارسال پیام</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for en in enrollments %}
+        <tr>
+          <td>
+            {{ en.student.get_full_name|default:en.student.username }}
+          </td>
+          <td>{{ en.student.email|default:'—' }}</td>
+          <td>{{ en.enrolled_at|date:"Y/m/d" }}</td>
+          <td>
+            {% if en.completed %}
+            <span class="badge bg-success">تکمیل شده</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">در حال تحصیل</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'start_conversation' en.student.pk %}"
+               class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-chat-dots"></i> پیام
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">
+            هنوز دانشجویی ثبت‌نام نکرده.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

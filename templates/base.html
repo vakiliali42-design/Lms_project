@@ -98,7 +98,7 @@
 </div>
 
 <!-- ── Navbar ─────────────────────────────────────────── -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
 
     <!-- برند -->
@@ -132,10 +132,20 @@
         </li>
         {% endif %}
       </ul>
-<!-- منوی راست -->
+
+      <!-- منوی راست -->
       <ul class="navbar-nav align-items-center">
 
         {% if request.user.is_authenticated %}
+
+        <!-- ← آیکون پیام‌ها -->
+        <li class="nav-item ms-2">
+          <a class="nav-link position-relative"
+             href="{% url 'conversation_list' %}"
+             title="پیام‌ها">
+            <i class="bi bi-chat-dots fs-5"></i>
+          </a>
+        </li>
 
         <!-- زنگوله اعلان -->
         <li class="nav-item ms-2">
@@ -181,7 +191,11 @@
                 <i class="bi bi-gear text-primary"></i> پروفایل
               </a>
             </li>
-            
+            <li>
+              <a class="dropdown-item" href="{% url 'conversation_list' %}">
+                <i class="bi bi-chat-dots text-info"></i> پیام‌ها
+              </a>
+            </li>
             {% if request.user.role == 'teacher' %}
             <li>
               <a class="dropdown-item" href="{% url 'create_course' %}">
@@ -191,8 +205,9 @@
             {% endif %}
             {% if request.user.role == 'admin' %}
             <li>
-              <a class="dropdown-item" href="{% url 'admin_dashboard' %}">
-                <i class="bi bi-shield-check text-danger"></i> پنل ادمین
+              <a class="dropdown-item text-danger"
+                 href="{% url 'admin_dashboard' %}">
+                <i class="bi bi-shield-check"></i> پنل مدیریت
               </a>
             </li>
             {% endif %}
