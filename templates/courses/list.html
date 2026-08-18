@@ -41,7 +41,11 @@
           {{ course.description|truncatechars:80 }}
         </p>
         <p class="small text-muted">
-          <i class="bi bi-person"></i> {{ course.teacher.get_full_name }}
+  <i class="bi bi-person"></i>
+  <a href="{% url 'teacher_profile' course.teacher.pk %}"
+      class="text-decoration-none">
+      {{ course.teacher.get_full_name }}
+      </a>
         </p>
       </div>
       <div class="card-footer bg-transparent">

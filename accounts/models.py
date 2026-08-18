@@ -22,13 +22,18 @@ class User(AbstractUser):
     def is_admin(self):
         return self.role == "admin"
 
-def __str__(self):
-    full_name = self.get_full_name().strip()
+    def __str__(self):
+        full_name = self.get_full_name().strip()
 
-    if full_name:
-        return f"{full_name} ({self.get_role_display()})"
+        if full_name:
+            return f"{full_name} ({self.get_role_display()})"
 
-    if self.username:
-        return f"{self.username} ({self.get_role_display()})"
+        if self.username:
+            return f"{self.username} ({self.get_role_display()})"
 
-    return self.email
+        return self.email
+
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = 'admin'
+        super().save(*args, **kwargs)

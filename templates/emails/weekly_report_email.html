@@ -1,0 +1,33 @@
+{% extends 'emails/base_email.html' %}
+{% block content %}
+
+{% if reminder_type == 'today' %}
+<h2>🚨 آخرین فرصت — مهلت امروز!</h2>
+{% else %}
+<h2>⏰ یادآوری — مهلت فردا!</h2>
+{% endif %}
+
+<p>دانشجوی گرامی <strong>{{ student_name }}</strong>،</p>
+
+{% if reminder_type == 'today' %}
+<p style="color:#c0392b; font-weight:bold;">
+  ⚠️ مهلت ارسال تکلیف زیر امروز تموم میشه و هنوز ارسال نکردید:
+</p>
+{% else %}
+<p>یادآوری: مهلت ارسال تکلیف زیر فردا تموم میشه:</p>
+{% endif %}
+
+<div class="info-box">
+  <p><strong>📝 تکلیف:</strong> {{ assignment_title }}</p>
+  <p><strong>📚 دوره:</strong> {{ course_title }}</p>
+  <p><strong>⏰ مهلت:</strong>
+    <span style="color:#c0392b; font-weight:bold;">{{ due_date }}</span>
+  </p>
+</div>
+
+<p>همین الان تکلیف خود را ارسال کنید:</p>
+<a href="{{ site_url }}/assignments/{{ assignment_pk }}/" class="btn">
+  ارسال تکلیف ←
+</a>
+
+{% endblock %}

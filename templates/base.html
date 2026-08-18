@@ -132,7 +132,24 @@
         </li>
         {% endif %}
       </ul>
-
+      <form class="d-flex mx-auto" method="get"
+      action="{% url 'global_search' %}"
+      style="max-width:300px; width:100%;">
+  <div class="input-group input-group-sm">
+    <input type="text" name="q" class="form-control"
+           placeholder="جستجو..."
+           style="border-radius:20px 0 0 20px; border:none;
+                  background:rgba(255,255,255,.15);
+                  color:white; font-size:.85rem;"
+           value="{{ request.GET.q|default:'' }}">
+            <button type="submit" class="btn btn-sm"
+            style="border-radius:0 20px 20px 0;
+                   background:rgba(255,255,255,.2);
+                   border:none; color:white;">
+      <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
       <!-- منوی راست -->
       <ul class="navbar-nav align-items-center">
 

@@ -1,0 +1,38 @@
+# env
+.env
+*.env
+
+# virtualenv
+venv/
+env/
+.venv/
+
+# python cache
+pycache/
+*.pyc
+*.pyo
+
+# git
+.git
+.gitignore
+
+# database
+db.sqlite3
+
+# logs
+*.log
+
+# temp
+tmp/
+*.tmp
+
+# static/media
+media/
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+
+# celery
+celerybeat-schedule

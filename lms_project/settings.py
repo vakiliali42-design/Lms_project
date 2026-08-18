@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import pymysql
+pymysql.install_as_MySQLdb()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +28,7 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,12 +42,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'crispy_bootstrap5',
+    'django_celery_beat',
+    'rest_framework',
     'accounts',
     'assignments',
     'courses',
     'notifications',
     'adminpanel',
-    'messaging'
+    'messaging',
+    'api',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -77,18 +83,48 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'lms_project.wsgi.application'
-
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
 }
 
+
+'''
+DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+'''
+
+'''
+DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'lms_db',
+            'USER': 'root',
+            'PASSWORD': '12345',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+    }
+}
+'''
+CACHES = {
+     "default": {
+         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+         'LOCATION': 'redis://redis:6379'
+     }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -120,19 +156,157 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGOUT_REDIRECT_URL = '/'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 AUTH_USER_MODEL = 'accounts.User'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+from django.db.backends.base.base import BaseDatabaseWrapper
+BaseDatabaseWrapper.check_database_version_supported = lambda self: None
+
+
+# ==========================================
+# Email Configuration
+# ==========================================
+EMAIL_BACKEND = os.getenv('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = f"سامانه آموزش آنلاین <{EMAIL_HOST_USER}>"
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# ==========================================
+# Celery Configuration
+# ==========================================
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tehran'
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
+
+
+# ── Celery Beat Schedule ──────────────────────────────────
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+
+    # هر روز ساعت ۸ صبح — یادآوری تکالیفی که فردا مهلتشون تموم میشه
+    'remind-due-tomorrow': {
+        'task':     'notifications.tasks.remind_due_assignments',
+        'schedule': crontab(hour=8, minute=0),
+        # یعنی: هر روز ساعت ۸:۰۰ صبح اجرا شو
+    },
+
+    # هر روز ساعت ۱۰ صبح — یادآوری تکالیفی که امروز مهلتشون تموم میشه
+    'remind-due-today': {
+        'task':     'notifications.tasks.remind_due_today',
+        'schedule': crontab(hour=10, minute=0),
+        # یعنی: هر روز ساعت ۱۰:۰۰ صبح اجرا شو
+    },
+
+    # هر دوشنبه ساعت ۹ صبح — گزارش هفتگی به اساتید
+    'weekly-teacher-report': {
+        'task':     'notifications.tasks.weekly_teacher_report',
+        'schedule': crontab(hour=9, minute=0, day_of_week=1),
+        # day_of_week=1 یعنی دوشنبه
+    },
+}
+
+# settings.py — این بخش رو اضافه کن
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'verbose': {
+            # فرمت لاگ: زمان | سطح | نام ماژول | پیام
+            'format': '{asctime} [{levelname}] {name}: {message}',
+            'style':  '{',
+        },
+    },
+
+    'handlers': {
+        # نمایش در terminal
+        'console': {
+            'class':     'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        # ذخیره در فایل — تمام لاگ‌ها
+        'file': {
+            'class':     'logging.FileHandler',
+            'filename':  BASE_DIR / 'logs/celery.log',
+            'formatter': 'verbose',
+        },
+    },
+
+    'loggers': {
+        # لاگ‌های اپ notifications
+        'notifications': {
+            'handlers': ['console', 'file'],
+            'level':    'INFO',
+            'propagate': True,
+        },
+        # لاگ‌های Celery
+        'celery': {
+            'handlers': ['console', 'file'],
+            'level':    'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE':       'LMS API',
+    'DESCRIPTION': 'سامانه مدیریت آموزش آنلاین',
+    'VERSION':     '1.0.0',
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}

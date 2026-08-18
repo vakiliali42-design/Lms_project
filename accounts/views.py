@@ -11,8 +11,21 @@ def register_view(request):
     if form.is_valid():
         user = form.save()
         login(request, user)
-        messages.success(request, "ثبت‌ نام موفق")
+        if user.email:
+            try:
+                from notifications.tasks import send_welcome_email
+                send_welcome_email.delay(
+                    user_email=user.email,
+                    user_name=user.get_full_name() or user.username,
+                    role=user.get_role_display(),
+                    site_url='http://120.0.0.8000'
+                )
+            except Exception:
+                pass  # اگه Celery خطا داد، ثبت‌نام متوقف نشه
+
+        messages.success(request, 'ثبت‌نام موفق!')
         return redirect('dashboard')
+
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
@@ -21,7 +34,7 @@ def login_view(request):
     if form.is_valid():
         user = form.get_user()
         login(request, user)
-        return redirect("dashboard")
+        return redirect("home")
 
     return render(request, 'accounts/login.html', {'form': form})
 

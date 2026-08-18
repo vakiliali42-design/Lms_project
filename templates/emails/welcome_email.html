@@ -1,0 +1,20 @@
+{% extends 'emails/base_email.html' %}
+{% block content %}
+<h2>🎓 خوش آمدید!</h2>
+<p>کاربر گرامی <strong>{{ user_name }}</strong>،</p>
+<p>ثبت‌نام شما در سامانه آموزش آنلاین با موفقیت انجام شد.</p>
+
+<div class="info-box">
+  <p><strong>👤 نقش شما:</strong> {{ role }}</p>
+</div>
+
+{% if role == 'دانشجو' %}
+<p>همین الان می‌توانید در دوره‌های مختلف ثبت‌نام کنید.</p>
+{% else %}
+<p>همین الان می‌توانید دوره‌های جدید ایجاد کنید.</p>
+{% endif %}
+
+<a href="{{ site_url }}/courses/" class="btn">
+  مشاهده دوره‌ها ←
+</a>
+{% endblock %}

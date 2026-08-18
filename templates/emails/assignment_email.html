@@ -1,0 +1,25 @@
+{% extends 'emails/base_email.html' %}
+{% block content %}
+<h2>📋 تکلیف جدید ثبت شد</h2>
+<p>دانشجوی گرامی <strong>{{ student_name }}</strong>،</p>
+<p>استاد <strong>{{ teacher_name }}</strong> تکلیف جدیدی در دوره شما تعریف کرده:</p>
+
+<div class="info-box">
+  <p><strong>📚 دوره:</strong> {{ course_title }}</p>
+  <p><strong>📝 تکلیف:</strong> {{ assignment_title }}</p>
+  <p><strong>⏰ مهلت تحویل:</strong> {{ due_date }}</p>
+  <p><strong>🏆 حداکثر نمره:</strong> {{ max_score }}</p>
+</div>
+
+{% if description %}
+<hr class="divider">
+<p><strong>توضیحات:</strong></p>
+<p style="background:#f8f9fa; padding:12px; border-radius:8px; font-size:13px;">
+  {{ description }}
+</p>
+{% endif %}
+
+<a href="{{ site_url }}/assignments/{{ assignment_pk }}/" class="btn">
+  مشاهده تکلیف ←
+</a>
+{% endblock %}

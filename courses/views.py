@@ -6,7 +6,13 @@ from .models import Course, Lesson, Enrollment, CourseContent, Review
 from .forms import CourseForm, LessonForm, CourseContentForm, ReviewForm
 from accounts.models import User
 from notifications.utils import notify_enrollment
+from django.views.decorators.cache import cache_page
+from django.db.models import Q
+from assignments.models import Assignment
+from assignments.models import User
 
+
+@cache_page(60 * 15)  # Cache for 15 minutes
 def course_list(request):
     courses = Course.objects.filter(is_published=True)
     return render(request, 'courses/list.html', {'courses': courses})
@@ -29,11 +35,12 @@ def course_detail(request, slug):
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
     if request.user.is_student():
-       enrollment, created = Enrollment.objects.get_or_create(student=request.user, course=course)
-       if created:
-            notify_enrollment(enrollment)
-       messages.success(request, f'در دوره «{course.title}» ثبت‌نام شدید.')
+            enrollment, created = Enrollment.objects.get_or_create(student=request.user, course=course)
+            if created:
+                notify_enrollment(enrollment)
+            messages.success(request, f'در دوره «{course.title}» ثبت‌نام شدید.')
     return redirect('course_detail', slug=slug)
+
 
 @login_required
 def create_course(request):
@@ -201,3 +208,62 @@ def delete_lesson(request, pk):
 
     messages.success(request, "جلسه حذف شد.")
     return redirect("course_detail", slug=slug)
+
+
+@login_required
+def teacher_profile(request, pk):
+    teacher = get_object_or_404(User, pk=pk, role="teacher")
+    courses = Course.objects.filter(
+        teacher=teacher,
+        is_published=True
+    ).order_by('created_at')
+    return render(request, 'courses/teacher_profile.html', {
+        'teacher':teacher,
+        'courses':courses,
+        'total_students':sum(c.students.count() for c in courses),
+        'total_courses':courses.count()
+    })
+
+def global_search(request):
+    q = request.GET.get('q', '').strip()
+
+    results = {
+        'courses':     [],
+        'assignments': [],
+        'teachers':    [],
+        'query':        q,
+    }
+
+    if q:
+        results['courses'] = Course.objects.filter(
+            is_published=True
+        ).filter(
+            Q(title__icontains=q) |
+            Q(description__icontains=q) |
+            Q(level__icontains=q)  |
+            Q(price__icontains=q) |
+            Q(teacher__first_name__icontains=q) |
+            Q(teacher__last_name__icontains=q)
+            ).select_related('teacher', 'category')[:10]
+
+        results['assignments'] = Assignment.objects.filter(
+            Q(title__icontains=q) |
+            Q(description__icontains=q)
+        ).select_related('course', 'teacher')[:10]
+
+        results["teachers"] = User.objects.filter(
+            role = 'teacher').filter(
+            Q(bio__icontains=q) |
+            Q(email__icontains=q) |
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(username__icontains=q)
+        )[:5]
+
+        results['total'] = (
+            len(results['courses']) +
+            len(results['assignments']) +
+            len(results['teachers'])
+        )
+
+        return render(request, 'courses/search.html', results)

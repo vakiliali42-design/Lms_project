@@ -1,0 +1,32 @@
+# Python files
+*.py text eol=lf
+
+# Shell scripts (Docker, entrypoint)
+*.sh text eol=lf
+
+# Windows scripts
+*.bat text eol=crlf
+
+# Django templates & static
+*.html text
+*.css text
+*.js text
+
+# Environment files
+.env text
+
+# Images (binary)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+
+# Logs (ignore diff)
+*.log -diff
+
+# Database (ignore diff)
+*.sqlite3 -diff
+
+# Migrations (optional: keep as text)
+*.py text

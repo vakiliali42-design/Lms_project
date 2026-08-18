@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block title %}جستجو — {{ query }}{% endblock %}
+
+{% block content %}
+
+<!-- فرم جستجو -->
+<div class="card p-4 mb-4"
+     style="background:linear-gradient(135deg,#1F4E79,#2E75B6);
+            border-radius:20px;">
+  <h4 class="text-white mb-3">
+    <i class="bi bi-search"></i> جستجوی پیشرفته
+  </h4>
+  <form method="get">
+    <div class="input-group input-group-lg">
+      <input type="text" name="q" class="form-control"
+             placeholder="جستجو در دوره‌ها، تکالیف، اساتید..."
+             value="{{ query }}"
+             style="border-radius:12px 0 0 12px; border:none;">
+      <button type="submit" class="btn btn-warning px-4"
+              style="border-radius:0 12px 12px 0; font-weight:600;">
+        <i class="bi bi-search"></i> جستجو
+      </button>
+    </div>
+  </form>
+</div>
+
+{% if query %}
+
+<!-- آمار نتایج -->
+<div class="d-flex align-items-center gap-3 mb-4">
+  <h5 class="mb-0">
+    نتایج جستجو برای
+    <span class="text-primary">"{{ query }}"</span>
+  </h5>
+  <span class="badge bg-primary rounded-pill">
+    {{ total }} نتیجه
+  </span>
+</div>
+
+{% if total == 0 %}
+<div class="text-center py-5">
+  <i class="bi bi-search" style="font-size:4rem; color:#CBD5E0;"></i>
+  <h5 class="mt-3 text-muted">نتیجه‌ای یافت نشد</h5>
+  <p class="text-muted small">
+    کلمه دیگری امتحان کنید یا فیلترها را تغییر دهید
+  </p>
+  <a href="{% url 'course_list' %}"
+     class="btn btn-outline-primary btn-sm mt-2">
+    مشاهده همه دوره‌ها
+  </a>
+</div>
+
+{% else %}
+
+<!-- نتایج دوره‌ها -->
+{% if courses %}
+<div class="mb-5">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-collection-fill text-primary fs-5"></i>
+    <h5 class="mb-0 fw-bold">دوره‌ها</h5>
+    <span class="badge bg-primary">{{ courses|length }}</span>
+  </div>
+
+  <div class="row g-3">
+    {% for course in courses %}
+    <div class="col-md-6">
+      <a href="{% url 'course_detail' course.slug %}"
+         class="text-decoration-none">
+        <div class="card p-3 h-100">
+          <div class="d-flex gap-3">
+            {% if course.thumbnail %}
+            <img src="{{ course.thumbnail.url }}"
+                 width="80" height="80"
+                 style="border-radius:10px; object-fit:cover;"
+                 alt="{{ course.title }}">
+            {% else %}
+            <div style="width:80px; height:80px; border-radius:10px;
+                        background:linear-gradient(135deg,#1F4E79,#2E75B6);
+                        display:flex; align-items:center;
+                        justify-content:center; flex-shrink:0;">
+              <i class="bi bi-collection text-white fs-3"></i>
+            </div>
+            {% endif %}
+            <div>
+              <h6 class="fw-bold text-dark mb-1">
+                {{ course.title }}
+              </h6>
+              <p class="text-muted small mb-1">
+                {{ course.description|truncatechars:60 }}
+              </p>
+              <div class="d-flex gap-2">
+                <span class="badge bg-secondary small">
+                  {{ course.get_level_display }}
+                </span>
+                {% if course.price == 0 %}
+                <span class="badge bg-success small">رایگان</span>
+                {% endif %}
+                <span class="text-muted small">
+                  <i class="bi bi-person"></i>
+                  {{ course.teacher.get_full_name }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- نتایج اساتید -->
+{% if teachers %}
+<div class="mb-5">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-mortarboard-fill text-success fs-5"></i>
+    <h5 class="mb-0 fw-bold">اساتید</h5>
+    <span class="badge bg-success">{{ teachers|length }}</span>
+  </div>
+          <div class="row g-3">
+    {% for teacher in teachers %}
+    <div class="col-md-4">
+      <a href="{% url 'teacher_profile' teacher.pk %}"
+         class="text-decoration-none">
+        <div class="card p-3 text-center">
+          {% if teacher.avatar %}
+          <img src="{{ teacher.avatar.url }}"
+               class="rounded-circle mx-auto mb-2"
+               width="60" height="60"
+               style="object-fit:cover;">
+          {% else %}
+          <div style="width:60px; height:60px; border-radius:50%;
+                      background:#DEEAF1; display:flex;
+                      align-items:center; justify-content:center;
+                      margin:0 auto 10px;">
+            <i class="bi bi-person-fill text-primary fs-3"></i>
+          </div>
+          {% endif %}
+          <h6 class="fw-bold text-dark mb-1">
+            {{ teacher.get_full_name|default:teacher.username }}
+          </h6>
+          <p class="text-muted small mb-0">
+            <i class="bi bi-collection"></i>
+            {{ teacher.taught_courses.count }} دوره
+          </p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- نتایج تکالیف -->
+{% if assignments and request.user.is_authenticated %}
+<div class="mb-4">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <i class="bi bi-clipboard-fill text-warning fs-5"></i>
+    <h5 class="mb-0 fw-bold">تکالیف</h5>
+    <span class="badge bg-warning text-dark">{{ assignments|length }}</span>
+  </div>
+
+  {% for assignment in assignments %}
+  <div class="card p-3 mb-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h6 class="fw-bold mb-1">{{ assignment.title }}</h6>
+        <p class="text-muted small mb-0">
+          <i class="bi bi-collection"></i>
+          {{ assignment.course.title }}
+          &nbsp;|&nbsp;
+          <i class="bi bi-calendar"></i>
+          مهلت: {{ assignment.due_date|date:"Y/m/d" }}
+        </p>
+      </div>
+      <a href="{% url 'assignment_list' assignment.course.slug %}"
+         class="btn btn-sm btn-outline-warning">
+        مشاهده
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endif %}
+{% endif %}
+
+{% endblock %}

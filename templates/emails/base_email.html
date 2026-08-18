@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f0f4f8;
+      direction: rtl;
+      padding: 30px 15px;
+    }
+    .wrapper { max-width:600px; margin:0 auto; }
+    .header {
+      background: linear-gradient(135deg, #1F4E79, #2E75B6);
+      border-radius: 16px 16px 0 0;
+      padding: 28px 30px;
+      text-align: center;
+    }
+    .header h1 { color:#fff; font-size:20px; margin-bottom:5px; }
+    .header p  { color:rgba(255,255,255,.7); font-size:12px; }
+    .body {
+      background: #fff;
+      padding: 32px 30px;
+      line-height: 2;
+      color: #2D3748;
+      font-size: 14px;
+    }
+    .body h2 {
+      color: #1F4E79;
+      font-size: 16px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #DEEAF1;
+    }
+    .info-box {
+      background: #EFF6FF;
+      border-right: 4px solid #2E75B6;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 18px 0;
+    }
+    .info-box p { margin: 4px 0; font-size:13px; }
+    .info-box strong { color: #1F4E79; }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #2E75B6, #1F4E79);
+      color: #fff !important;
+      text-decoration: none;
+      padding: 11px 28px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      margin: 18px 0 5px;
+    }
+    .divider { border:none; border-top:1px solid #E2E8F0; margin:18px 0; }
+    .footer {
+      background: #F7FAFC;
+      border-radius: 0 0 16px 16px;
+      padding: 18px 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #718096;
+      border-top: 1px solid #E2E8F0;
+    }
+    .footer a { color:#2E75B6; text-decoration:none; }
+    .badge {
+      display:inline-block; padding:3px 10px;
+      border-radius:20px; font-size:12px; font-weight:bold;
+    }
+    .badge-green  { background:#E2EFDA; color:#375623; }
+    .badge-orange { background:#FFF2CC; color:#7F5000; }
+    .badge-red    { background:#FCE4D6; color:#7F2000; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>🎓 سامانه آموزش آنلاین</h1>
+      <p>Learning Management System</p>
+    </div>
+    <div class="body">
+      {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+      <p>این ایمیل به صورت خودکار ارسال شده — لطفاً پاسخ ندهید.</p>
+      <p style="margin-top:8px;">
+        <a href="{{ site_url }}">ورود به سامانه</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

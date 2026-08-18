@@ -1,0 +1,16 @@
+{% extends 'emails/base_email.html' %}
+{% block content %}
+<h2>👋 دانشجوی جدید در دوره شما</h2>
+<p>استاد گرامی <strong>{{ teacher_name }}</strong>،</p>
+<p>دانشجوی جدیدی در دوره شما ثبت‌نام کرده است:</p>
+
+<div class="info-box">
+  <p><strong>👤 دانشجو:</strong> {{ student_name }}</p>
+  <p><strong>📚 دوره:</strong> {{ course_title }}</p>
+  <p><strong>📅 تاریخ:</strong> {{ enrolled_at }}</p>
+</div>
+
+<a href="{{ site_url }}/courses/{{ course_slug }}/students/" class="btn">
+  مشاهده دانشجویان ←
+</a>
+{% endblock %}

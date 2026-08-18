@@ -1,0 +1,22 @@
+{% extends 'emails/base_email.html' %}
+{% block content %}
+<h2>📤 تکلیف جدید ارسال شد</h2>
+<p>استاد گرامی <strong>{{ teacher_name }}</strong>،</p>
+<p>دانشجو تکلیف خود را ارسال کرده است:</p>
+
+<div class="info-box">
+  <p><strong>👤 دانشجو:</strong> {{ student_name }}</p>
+  <p><strong>📝 تکلیف:</strong> {{ assignment_title }}</p>
+  <p><strong>📚 دوره:</strong> {{ course_title }}</p>
+  <p>
+    <strong>وضعیت:</strong>
+    <span class="badge {% if is_late %}badge-red{% else %}badge-green{% endif %}">
+      {% if is_late %}دیر ارسال شده{% else %}به موقع{% endif %}
+    </span>
+  </p>
+</div>
+
+<a href="{{ site_url }}/assignments/{{ assignment_pk }}/" class="btn">
+  مشاهده و نمره‌دهی ←
+</a>
+{% endblock %}

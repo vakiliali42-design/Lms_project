@@ -1,0 +1,74 @@
+# docker-compose.yml
+
+version: '3.9'
+
+services:
+
+  web:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+
+  celery:
+    build: .
+    command: sh -c "celery -A lms_project worker --loglevel=info -E --hostname=worker@%%h"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+
+  celery-beat:
+    build: .
+    command: sh -c "celery -A lms_project beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+
+  flower:
+    build: .
+    command: sh -c "celery -A lms_project flower --port=5555"
+    volumes:
+      - .:/app
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis_data:/data
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB:       lms_db
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: asd12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  redis_data:

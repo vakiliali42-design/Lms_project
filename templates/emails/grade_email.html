@@ -1,0 +1,33 @@
+{% extends 'emails/base_email.html' %}
+{% block content %}
+<h2>🏆 نمره تکلیف شما ثبت شد</h2>
+<p>دانشجوی گرامی <strong>{{ student_name }}</strong>،</p>
+<p>استاد <strong>{{ teacher_name }}</strong> به تکلیف شما نمره داد:</p>
+
+<div class="info-box">
+  <p><strong>📝 تکلیف:</strong> {{ assignment_title }}</p>
+  <p><strong>📚 دوره:</strong> {{ course_title }}</p>
+  <p>
+    <strong>🏆 نمره:</strong>
+    <span class="badge
+      {% if score >= 16 %}badge-green
+      {% elif score >= 12 %}badge-orange
+      {% else %}badge-red{% endif %}">
+      {{ score }} از {{ max_score }}
+    </span>
+  </p>
+</div>
+
+{% if feedback %}
+<hr class="divider">
+<p><strong>💬 بازخورد استاد:</strong></p>
+<p style="background:#f8f9fa; padding:14px; border-radius:8px;
+          border-right:3px solid #2E75B6; font-size:13px;">
+  {{ feedback }}
+</p>
+{% endif %}
+
+<a href="{{ site_url }}/assignments/{{ assignment_pk }}/" class="btn">
+  مشاهده جزئیات ←
+</a>
+{% endblock %}
