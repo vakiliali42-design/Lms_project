@@ -3,7 +3,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm, LoginForm, ProfileUpdateForm
-from courses.models import Course, Lesson
+from courses.models import Course, Lesson, Enrollment
+from assignments.models import Assignment, Submission
 from accounts.models import User
 
 def register_view(request):
@@ -53,14 +54,45 @@ def profile_view(request):
 
 @login_required
 def dashboard_view(request):
-    return render(request, "accounts/dashboard.html")
+    user = request.user
+    ctx  = {}
+
+    if user.is_student():
+        # دوره‌های ثبت‌نامی دانشجو
+        ctx['enrollments'] = Enrollment.objects.filter(
+            student=user
+        ).select_related('course').all()
+
+        # تکالیف ارسال‌شده دانشجو
+        ctx['submissions'] = Submission.objects.filter(
+            student=user
+        ).select_related('assignment__course').all()
+
+    elif user.is_teacher():
+        # دوره‌های استاد
+        ctx['courses'] = Course.objects.filter(
+            teacher=user
+        ).all()
+
+        # تکالیف تعریف‌شده استاد
+        ctx['assignments'] = Assignment.objects.filter(
+            teacher=user
+        ).select_related('course').order_by('-created_at')[:10]
+
+    elif user.is_admin():
+        ctx['total_users']   = User.objects.count()
+        ctx['total_courses'] = Course.objects.count()
+
+    return render(request, 'accounts/dashboard.html', ctx)
 
 
 def home_view(request):
-    return render(request, "home.html" , {
-        'total_courses': Course.objects.filter(is_published=True).count(),
+    return render(request, 'home.html', {
+        'total_courses':  Course.objects.filter(is_published=True).count(),
         'total_teachers': User.objects.filter(role='teacher').count(),
         'total_students': User.objects.filter(role='student').count(),
-        'total_lessons': Lesson.objects.filter(is_published=True).count(),
-        'recent_course': Course.objects.filter(is_published=True).order_by('-created_at')[:3],
+        'total_lessons':  Lesson.objects.count(),
+        'recent_courses': Course.objects.filter(
+            is_published=True
+        ).order_by('-created_at')[:3],
     })

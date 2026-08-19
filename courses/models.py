@@ -25,7 +25,7 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
-    def avarage_score(self):
+    def average_score(self):
         reviews = self.reviews.all()
         if reviews.exists():
             total = sum(review.score for review in reviews)

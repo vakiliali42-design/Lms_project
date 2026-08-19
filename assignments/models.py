@@ -12,10 +12,10 @@ class Assignment(models.Model):
     max_score   = models.PositiveIntegerField(default=100)
     created_at  = models.DateTimeField(auto_now_add=True)
 
-    def str(self): return f"{self.course.title} — {self.title}"
+    def __str__(self): return f"{self.course.title} — {self.title}"
 
 class Submission(models.Model):
-    STATUS_CHOICES = (('submitted','ارسال شده'), ('graded','نمره‌دهی شده'), ('late','دیر ارسال'))
+    STATUS_CHOICES = (('submitted','ارسال شده'), ('graded','نمره‌دهی شده'), ('late','دیر ارسال شده'))
 
     assignment  = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
     student     = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
@@ -29,4 +29,4 @@ class Submission(models.Model):
     class Meta:
         unique_together = ('assignment', 'student')
 
-    def str(self): return f"{self.student} → {self.assignment.title}"
+    def __str__(self): return f"{self.student} → {self.assignment.title}"

@@ -1,27 +1,85 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}تکالیف {{ course.title }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-7">
-    <div class="card p-4">
-      <h4 class="mb-4">
-        <i class="bi bi-pencil-square text-primary"></i> {{ title }}
-      </h4>
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <div class="d-flex gap-2 mt-3">
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-lg"></i> ذخیره
-          </button>
-          <a href="javascript:history.back()" class="btn btn-outline-secondary">
-            انصراف
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>
+    <i class="bi bi-clipboard-check text-primary"></i>
+    تکالیف — {{ course.title }}
+  </h4>
+  {% if request.user == course.teacher or request.user.role == 'admin' %}
+  <a href="{% url 'create_assignment' course.slug %}"
+     class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> تکلیف جدید
+  </a>
+  {% endif %}
+</div>
+
+{% for assignment in assignments %}
+<div class="card mb-3 p-3">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h5 class="mb-1">{{ assignment.title }}</h5>
+      <p class="text-muted small mb-1">
+        {{ assignment.description|truncatechars:120 }}
+      </p>
+      <div class="d-flex gap-2 flex-wrap">
+        <span class="badge bg-secondary">
+          <i class="bi bi-calendar"></i>
+          مهلت: {{ assignment.due_date|date:"Y/m/d H:i" }}
+        </span>
+        <span class="badge bg-info text-dark">
+          نمره کامل: {{ assignment.max_score }}
+        </span>
+
+        {% if request.user.role == 'student' %}
+          {% with sub=my_submissions|default_if_none:"" %}
+          {% for key, val in my_submissions.items %}
+            {% if key == assignment.pk %}
+              <span class="badge
+                {% if val.status == 'graded' %}bg-success
+                {% elif val.status == 'late' %}bg-danger
+                {% else %}bg-warning text-dark{% endif %}">
+                {{ val.get_status_display }}
+              </span>
+            {% endif %}
+          {% endfor %}
+          {% endwith %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="d-flex flex-column gap-2">
+      {% if request.user.role == 'student' %}
+        {% if assignment.pk in my_submissions %}
+          <a href="{% url 'assignment_detail' assignment.pk %}"
+             class="btn btn-sm btn-outline-success">
+            <i class="bi bi-eye"></i> مشاهده
           </a>
-        </div>
-      </form>
+        {% else %}
+          <a href="{% url 'submit_assignment' assignment.pk %}"
+             class="btn btn-sm btn-primary">
+            <i class="bi bi-upload"></i> ارسال
+          </a>
+        {% endif %}
+
+      {% elif request.user == course.teacher or request.user.role == 'admin' %}
+        <a href="{% url 'assignment_detail' assignment.pk %}"
+           class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-eye"></i> ارسال‌ها
+        </a>
+        <a href="{% url 'edit_assignment' assignment.pk %}"
+           class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-pencil"></i> ویرایش
+        </a>
+      {% endif %}
     </div>
   </div>
 </div>
+{% empty %}
+<div class="text-center text-muted py-5">
+  <i class="bi bi-clipboard fs-1"></i>
+  <p class="mt-2">تکلیفی ثبت نشده.</p>
+</div>
+{% endfor %}
 {% endblock %}

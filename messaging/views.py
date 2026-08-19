@@ -11,12 +11,12 @@ from notifications.utils import send_notification
 @login_required
 def conversation_list(request):
     convs = request.user.conversations.prefetch_related(
-        'participants',
-        'messages'
-    ).order_by('-uploaded_at')
+        'participants', 'messages'
+    ).order_by('-created_at')
 
+    # ← این حلقه مهمه — other و unread رو به هر conv اضافه می‌کنه
     for conv in convs:
-        conv.other_user = conv.get_other_user(request.user)
+        conv.other  = conv.get_other_user(request.user)
         conv.unread = conv.unread_count(request.user)
 
     return render(request, 'messaging/list.html', {

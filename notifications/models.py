@@ -22,5 +22,5 @@ class Notification(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-    def str(self):
+    def __str__(self):
         return f"{self.recipient.username} — {self.title}"
