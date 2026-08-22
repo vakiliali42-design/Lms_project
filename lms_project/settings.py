@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'messaging',
     'api',
     'drf_spectacular',
+    'ai_engine',
 ]
 
 MIDDLEWARE = [

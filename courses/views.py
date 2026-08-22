@@ -9,10 +9,8 @@ from notifications.utils import notify_enrollment
 from django.views.decorators.cache import cache_page
 from django.db.models import Q
 from assignments.models import Assignment
-from assignments.models import User
 
 
-@cache_page(60 * 15)  # Cache for 15 minutes
 def course_list(request):
     courses = Course.objects.filter(is_published=True)
     return render(request, 'courses/list.html', {'courses': courses})
@@ -266,4 +264,4 @@ def global_search(request):
             len(results['teachers'])
         )
 
-        return render(request, 'courses/search.html', results)
+    return render(request, 'courses/search.html', results)

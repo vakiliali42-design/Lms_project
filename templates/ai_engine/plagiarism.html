@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}بررسی تقلب{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>
+    <i class="bi bi-shield-check text-danger"></i>
+    بررسی تقلب — {{ assignment.title }}
+  </h4>
+  <!-- تغییر آستانه -->
+  <div class="d-flex gap-2 align-items-center">
+    <span class="text-muted small">آستانه شباهت:</span>
+    <a href="?threshold=0.5"
+       class="btn btn-sm {% if threshold == 50 %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      ۵۰٪
+    </a>
+    <a href="?threshold=0.7"
+       class="btn btn-sm {% if threshold == 70 %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      ۷۰٪
+    </a>
+    <a href="?threshold=0.9"
+       class="btn btn-sm {% if threshold == 90 %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      ۹۰٪
+    </a>
+  </div>
+</div>
+
+{% if results %}
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle"></i>
+  <strong>{{ results|length }} جفت مشکوک</strong> پیدا شد
+  (آستانه: {{ threshold }}٪)
+</div>
+
+{% for r in results %}
+<div class="card mb-3 p-3
+  {% if r.level == 'VERY HIGH' %}border-danger
+  {% elif r.level == 'HIGH' %}border-warning
+  {% else %}border-info{% endif %}
+  border-2">
+
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <!-- نوار شباهت -->
+        <div style="width:200px; height:20px; background:#e9ecef;
+                    border-radius:10px; overflow:hidden;">
+          <div style="width:{{ r.similarity }}%;
+                      height:100%;
+                      background:{% if r.similarity >= 90 %}#dc3545{% elif r.similarity >= 80 %}#fd7e14{% else %}#ffc107{% endif %};
+                      border-radius:10px;
+                      transition: width .5s ease;">
+          </div>
+        </div>
+        <strong style="font-size:1.2rem;">
+          {{ r.similarity }}٪
+        </strong>
+        <span class="badge
+          {% if r.level == 'VERY HIGH' %}bg-danger
+          {% elif r.level == 'HIGH' %}bg-warning text-dark
+          {% else %}bg-info text-dark{% endif %}">
+          {{ r.level_fa }}
+        </span>
+      </div>
+
+      <p class="mb-1">
+        <i class="bi bi-person-fill text-primary"></i>
+        <strong>{{ r.student1.get_full_name|default:r.student1.username }}</strong>
+        <span class="text-muted mx-2">←→</span>
+        <i class="bi bi-person-fill text-danger"></i>
+        <strong>{{ r.student2.get_full_name|default:r.student2.username }}</strong>
+      </p>
+    </div>
+
+    <div class="d-flex flex-column gap-1">
+      <a href="{{ r.submission1.file.url }}"
+         class="btn btn-sm btn-outline-primary" target="_blank">
+        <i class="bi bi-download"></i>
+        {{ r.student1.username }}
+      </a>
+      <a href="{{ r.submission2.file.url }}"
+         class="btn btn-sm btn-outline-danger" target="_blank">
+        <i class="bi bi-download"></i>
+        {{ r.student2.username }}
+      </a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="text-center text-muted py-5">
+  <i class="bi bi-shield-check text-success" style="font-size:4rem;"></i>
+  <h5 class="mt-3 text-success">تقلبی پیدا نشد</h5>
+  <p>هیچ تکلیفی با شباهت بیشتر از {{ threshold }}٪ پیدا نشد.</p>
+</div>
+{% endif %}
+
+{% endblock %}

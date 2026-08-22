@@ -287,3 +287,5 @@ pyrightconfig.json
 logs/*.log
 
 backup.sql
+
+staticfiles/

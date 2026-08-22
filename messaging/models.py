@@ -6,10 +6,10 @@ class Conversation(models.Model):
         User, related_name='conversations'
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    uploaded_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-uploaded_at']
+        ordering = ['-updated_at']
 
     def __str__(self):
             names = ', '.join(
@@ -46,7 +46,7 @@ class Message(models.Model):
     class Meta:
         ordering = ['created_at']
 
-    def str(self):
+    def __str__(self):
         return f"{self.sender.username}: {self.content[:30]}"
 
 

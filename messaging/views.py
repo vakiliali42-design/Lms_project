@@ -53,7 +53,7 @@ def conversation_detail(request, pk):
             notif_type = 'submission',
             title      = f'پیام جدید از {request.user.get_full_name() or request.user.username}',
             message    = msg.content[:100],
-            link       = f'/messages/{conv.pk}/',
+            link       = f'/messaging/{conv.pk}/',
         )
 
         return redirect('conversation_detail', pk=conv.pk)

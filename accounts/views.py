@@ -19,7 +19,7 @@ def register_view(request):
                     user_email=user.email,
                     user_name=user.get_full_name() or user.username,
                     role=user.get_role_display(),
-                    site_url='http://120.0.0.8000'
+                    site_url='http://127.0.0.1:8000'
                 )
             except Exception:
                 pass  # اگه Celery خطا داد، ثبت‌نام متوقف نشه
