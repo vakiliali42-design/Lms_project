@@ -30,3 +30,5 @@
 
 # Migrations (optional: keep as text)
 *.py text
+
+* text=auto
