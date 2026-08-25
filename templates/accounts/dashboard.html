@@ -7,15 +7,40 @@
   داشبورد — {{ request.user.get_role_display }}
 </h4>
 
-<!-- داشبورد دانشجو -->
+<!-- ── داشبورد دانشجو ── -->
 {% if request.user.role == 'student' %}
 <div class="row g-4">
+
+  <!-- بنر AI پیشنهاد دوره -->
+  <div class="col-12">
+    <div class="card p-3"
+         style="background:linear-gradient(135deg,#1F4E79,#2E75B6);
+                border-radius:16px;">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="text-white mb-1">
+            <i class="bi bi-robot"></i> پیشنهاد هوشمند دوره
+          </h6>
+          <p class="text-white-50 small mb-0">
+            بر اساس علاقه‌مندی دانشجویان مشابه شما
+          </p>
+        </div>
+        <a href="{% url 'recommendations' %}"
+           class="btn btn-light btn-sm">
+          <i class="bi bi-arrow-left"></i> مشاهده پیشنهادات
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- دوره‌های من -->
   <div class="col-12">
     <div class="card p-3">
       <h5><i class="bi bi-book text-primary"></i> دوره‌های من</h5>
       <hr>
       {% for en in enrollments %}
-      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+      <div class="d-flex justify-content-between align-items-center
+                  py-2 border-bottom">
         <span>{{ en.course.title }}</span>
         <div>
           <a href="{% url 'course_detail' en.course.slug %}"
@@ -25,26 +50,32 @@
         </div>
       </div>
       {% empty %}
-      <p class="text-muted">هنوز در دوره‌ای ثبت‌نام نکرده‌اید.
+      <p class="text-muted">
+        هنوز در دوره‌ای ثبت‌نام نکرده‌اید.
         <a href="{% url 'course_list' %}">مشاهده دوره‌ها</a>
       </p>
       {% endfor %}
     </div>
   </div>
 
+  <!-- تکالیف ارسال‌شده -->
   <div class="col-12">
     <div class="card p-3">
-      <h5><i class="bi bi-file-earmark-check text-success"></i> تکالیف ارسال‌شده</h5>
+      <h5>
+        <i class="bi bi-file-earmark-check text-success"></i>
+        تکالیف ارسال‌شده
+      </h5>
       <hr>
       {% for sub in submissions %}
-      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+      <div class="d-flex justify-content-between align-items-center
+                  py-2 border-bottom">
         <span>{{ sub.assignment.title }}</span>
         <span class="badge
           {% if sub.status == 'graded' %}bg-success
           {% elif sub.status == 'late' %}bg-danger
           {% else %}bg-warning text-dark{% endif %}">
           {{ sub.get_status_display }}
-          {% if sub.score %} — {{ sub.score }} {% endif %}
+          {% if sub.score %} — {{ sub.score }}{% endif %}
         </span>
       </div>
       {% empty %}
@@ -52,22 +83,50 @@
       {% endfor %}
     </div>
   </div>
+
 </div>
 
-<!-- داشبورد استاد -->
+<!-- ── داشبورد استاد ── -->
 {% elif request.user.role == 'teacher' %}
 <div class="row g-4">
+
+  <!-- بنر AI تشخیص تقلب -->
+  <div class="col-12">
+    <div class="card p-3"
+         style="background:linear-gradient(135deg,#7F2000,#c0392b);
+                border-radius:16px;">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="text-white mb-1">
+            <i class="bi bi-shield-check"></i> بررسی هوشمند تقلب
+          </h6>
+          <p class="text-white-50 small mb-0">
+            با AI تکالیف مشابه را شناسایی کنید
+          </p>
+        </div>
+        <div class="text-white-50 small">
+          از صفحه هر تکلیف → دکمه بررسی تقلب
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- دوره‌های من -->
   <div class="col-md-6">
     <div class="card p-3">
       <div class="d-flex justify-content-between align-items-center">
-        <h5><i class="bi bi-collection text-primary"></i> دوره‌های من</h5>
-        <a href="{% url 'create_course' %}" class="btn btn-sm btn-primary">
+        <h5>
+          <i class="bi bi-collection text-primary"></i> دوره‌های من
+        </h5>
+        <a href="{% url 'create_course' %}"
+           class="btn btn-sm btn-primary">
           <i class="bi bi-plus"></i> دوره جدید
         </a>
       </div>
-      <hr>
+              <hr>
       {% for course in courses %}
-      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+      <div class="d-flex justify-content-between align-items-center
+                  py-2 border-bottom">
         <span>{{ course.title }}</span>
         <div>
           <a href="{% url 'course_detail' course.slug %}"
@@ -82,23 +141,38 @@
     </div>
   </div>
 
+  <!-- تکالیف اخیر -->
   <div class="col-md-6">
     <div class="card p-3">
-      <h5><i class="bi bi-clipboard-check text-success"></i> تکالیف اخیر</h5>
+      <h5>
+        <i class="bi bi-clipboard-check text-success"></i>
+        تکالیف اخیر
+      </h5>
       <hr>
       {% for asgn in assignments %}
-      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-        <span>{{ asgn.title }}</span>
-        <small class="text-muted">{{ asgn.course.title }}</small>
+      <div class="d-flex justify-content-between align-items-center
+                  py-2 border-bottom">
+        <div>
+          <span>{{ asgn.title }}</span>
+          <br>
+          <small class="text-muted">{{ asgn.course.title }}</small>
+        </div>
+        <!-- دکمه بررسی تقلب کنار هر تکلیف -->
+        <a href="{% url 'plagiarism_check' asgn.pk %}"
+           class="btn btn-sm btn-outline-danger"
+           title="بررسی تقلب">
+          <i class="bi bi-shield-check"></i>
+        </a>
       </div>
       {% empty %}
       <p class="text-muted">تکلیفی ثبت نشده.</p>
       {% endfor %}
     </div>
   </div>
+
 </div>
 
-<!-- داشبورد ادمین -->
+<!-- ── داشبورد ادمین ── -->
 {% elif request.user.role == 'admin' %}
 <div class="row g-4">
   <div class="col-md-4">
@@ -118,9 +192,15 @@
   <div class="col-md-4">
     <div class="card p-4 text-center">
       <i class="bi bi-gear fs-1 text-warning"></i>
-      <a href="/admin/" class="btn btn-warning mt-3 d-block">پنل ادمین</a>
+      <a href="/adminpanel/" class="btn btn-primary mt-3 d-block">
+        پنل مدیریت
+      </a>
+      <a href="/admin/" class="btn btn-warning mt-2 d-block">
+        پنل ادمین Django
+      </a>
     </div>
   </div>
 </div>
 {% endif %}
+
 {% endblock %}

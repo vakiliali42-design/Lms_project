@@ -13,7 +13,7 @@
 <!-- دانشجو -->
 {% if request.user.role == 'student' %}
   {% if my_submission %}
-  <a href="{% url 'ai_recommendations' %}"
+  <a href="{% url 'recommendations' %}"
      class="btn btn-outline-success btn-sm mb-3">
     <i class="bi bi-robot"></i> پیشنهاد دوره
   </a>
@@ -38,7 +38,7 @@
 <!-- استاد و ادمین -->
 {% elif request.user.role == 'teacher' or request.user.role == 'admin' %}
   <div class="d-flex gap-2 mb-4">
-    <a href="{% url 'ai_plagiarism' assignment.pk %}"
+    <a href="{% url 'plagiarism_check' assignment.pk %}"
        class="btn btn-outline-danger">
       <i class="bi bi-shield-check"></i> بررسی تقلب
     </a>

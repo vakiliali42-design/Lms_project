@@ -98,155 +98,196 @@
 </div>
 
 <!-- ── Navbar ─────────────────────────────────────────── -->
-<nav class="navbar navbar-expand-lg navbar-dark">
+<nav class="navbar navbar-expand-lg navbar-dark"
+     style="background: linear-gradient(135deg, #1F4E79, #2E75B6);
+            box-shadow: 0 2px 20px rgba(30,78,121,.3);">
   <div class="container">
 
     <!-- برند -->
-    <a class="navbar-brand" href="{% url 'home' %}">
+    <a class="navbar-brand fw-bold" href="{% url 'home' %}">
       <i class="bi bi-mortarboard-fill me-2"></i>LMS
     </a>
 
     <!-- دکمه موبایل -->
-    <button class="navbar-toggler" type="button"
+    <button class="navbar-toggler border-0" type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navMenu"
-            aria-controls="navMenu"
-            aria-expanded="false">
+            data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navMenu">
-
-      <!-- منوی چپ -->
-      <ul class="navbar-nav me-auto">
+ <!-- ── منوی چپ ── -->
+      <ul class="navbar-nav me-3">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'course_list' %}">
+          <a class="nav-link px-3" href="{% url 'home' %}">
+            <i class="bi bi-house-fill"></i> خانه
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-3" href="{% url 'course_list' %}">
             <i class="bi bi-collection"></i> دوره‌ها
           </a>
         </li>
         {% if request.user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'dashboard' %}">
+          <a class="nav-link px-3" href="{% url 'dashboard' %}">
             <i class="bi bi-speedometer2"></i> داشبورد
           </a>
         </li>
         {% endif %}
       </ul>
-      <form class="d-flex mx-auto" method="get"
-      action="{% url 'global_search' %}"
-      style="max-width:300px; width:100%;">
-  <div class="input-group input-group-sm">
-    <input type="text" name="q" class="form-control"
-           placeholder="جستجو..."
-           style="border-radius:20px 0 0 20px; border:none;
-                  background:rgba(255,255,255,.15);
-                  color:white; font-size:.85rem;"
-           value="{{ request.GET.q|default:'' }}">
-            <button type="submit" class="btn btn-sm"
-            style="border-radius:0 20px 20px 0;
-                   background:rgba(255,255,255,.2);
-                   border:none; color:white;">
-      <i class="bi bi-search"></i>
+
+      <!-- ── سرچ وسط ── -->
+      {% if request.user.is_authenticated %}
+      <form class="d-flex flex-grow-1 mx-3"
+            method="get"
+            action="{% url 'global_search' %}">
+        <div class="input-group">
+          <input type="text"
+                 name="q"
+                 class="form-control form-control-sm"
+                 placeholder="جستجو در دوره‌ها، اساتید..."
+                 value="{{ request.GET.q|default:'' }}"
+                 style="border-radius: 20px 0 0 20px;
+                        border: none;
+                        background: rgba(255,255,255,.15);
+                        color: white;">
+          <button type="submit"
+                  class="btn btn-sm px-3"
+                  style="border-radius: 0 20px 20px 0;
+                         background: rgba(255,255,255,.2);
+                         border: none;
+                         color: white;">
+            <i class="bi bi-search"></i>
           </button>
         </div>
       </form>
-      <!-- منوی راست -->
-      <ul class="navbar-nav align-items-center">
+      {% endif %}
+
+      <!-- ── منوی راست ── -->
+      <ul class="navbar-nav align-items-center gap-1 ms-auto">
 
         {% if request.user.is_authenticated %}
 
-        <!-- ← آیکون پیام‌ها -->
-        <li class="nav-item ms-2">
-          <a class="nav-link position-relative"
-             href="{% url 'conversation_list' %}"
+        <!-- پیام -->
+        <li class="nav-item">
+          <a class="nav-link px-2" href="{% url 'conversation_list' %}"
              title="پیام‌ها">
             <i class="bi bi-chat-dots fs-5"></i>
           </a>
         </li>
 
-        <!-- زنگوله اعلان -->
-        <li class="nav-item ms-2">
-          <a class="nav-link position-relative"
+        <!-- زنگوله -->
+        <li class="nav-item">
+          <a class="nav-link px-2 position-relative"
              href="{% url 'notification_list' %}"
              title="اعلان‌ها">
             <i class="bi bi-bell fs-5"></i>
             {% if unread_notif_count > 0 %}
-            <span class="notif-badge">{{ unread_notif_count }}</span>
+            <span class="position-absolute top-0 start-100
+                         translate-middle badge rounded-pill bg-danger"
+                  style="font-size:.6rem;">
+              {{ unread_notif_count }}
+            </span>
             {% endif %}
           </a>
         </li>
 
-        <!-- dropdown کاربر -->
-        <li class="nav-item dropdown ms-2">
+        <!-- کاربر -->
+        <li class="nav-item dropdown ms-1">
           <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
              href="#"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
+             data-bs-toggle="dropdown">
             {% if request.user.avatar %}
             <img src="{{ request.user.avatar.url }}"
                  class="rounded-circle"
                  width="28" height="28"
-                 style="object-fit:cover;"
-                 alt="avatar">
+                 style="object-fit:cover; border:2px solid rgba(255,255,255,.5);">
             {% else %}
-            <i class="bi bi-person-circle fs-5"></i>
+             <i class="bi bi-person-circle fs-5"></i>
             {% endif %}
-            <span class="d-none d-md-inline">
+            <span class="d-none d-lg-inline small">
               {{ request.user.get_full_name|default:request.user.username }}
             </span>
-            <span class="badge badge-{{ request.user.role }}">
+            <span class="badge badge-{{ request.user.role }} d-none d-lg-inline">
               {{ request.user.get_role_display }}
             </span>
           </a>
-          <ul class="dropdown-menu dropdown-menu-start shadow border-0">
-            <li class="px-3 py-2 text-muted small border-bottom">
-              <i class="bi bi-envelope"></i>
-              {{ request.user.email }}
+ <!-- dropdown menu -->
+          <ul class="dropdown-menu dropdown-menu-start shadow border-0 mt-2"
+              style="border-radius:12px; min-width:220px;">
+            <!-- اطلاعات کاربر -->
+            <li class="px-3 py-2 border-bottom">
+              <div class="small text-muted">
+                <i class="bi bi-envelope me-1"></i>
+                {{ request.user.email|default:'ایمیل ثبت نشده' }}
+              </div>
+              <div class="small">
+                <span class="badge badge-{{ request.user.role }}">
+                  {{ request.user.get_role_display }}
+                </span>
+              </div>
             </li>
+
             <li>
-              <a class="dropdown-item" href="{% url 'profile' %}">
-                <i class="bi bi-gear text-primary"></i> پروفایل
+              <a class="dropdown-item py-2" href="{% url 'profile' %}">
+                <i class="bi bi-gear text-primary me-2"></i> پروفایل
               </a>
             </li>
+
             <li>
-              <a class="dropdown-item" href="{% url 'conversation_list' %}">
-                <i class="bi bi-chat-dots text-info"></i> پیام‌ها
+              <a class="dropdown-item py-2"
+                 href="{% url 'conversation_list' %}">
+                <i class="bi bi-chat-dots text-info me-2"></i> پیام‌ها
               </a>
             </li>
+
             {% if request.user.role == 'teacher' %}
             <li>
-              <a class="dropdown-item" href="{% url 'create_course' %}">
-                <i class="bi bi-plus-circle text-success"></i> دوره جدید
+              <a class="dropdown-item py-2"
+                 href="{% url 'create_course' %}">
+                <i class="bi bi-plus-circle text-success me-2"></i>
+                دوره جدید
               </a>
             </li>
             {% endif %}
+
             {% if request.user.role == 'admin' %}
             <li>
-              <a class="dropdown-item text-danger"
+              <a class="dropdown-item py-2"
                  href="{% url 'admin_dashboard' %}">
-                <i class="bi bi-shield-check"></i> پنل مدیریت
+                <i class="bi bi-shield-check text-warning me-2"></i>
+                پنل مدیریت
               </a>
             </li>
             {% endif %}
-            <li><hr class="dropdown-divider"></li>
+
+            <li><hr class="dropdown-divider my-1"></li>
+
             <li>
-              <a class="dropdown-item text-danger" href="{% url 'logout' %}">
-                <i class="bi bi-box-arrow-left"></i> خروج
-              </a>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="dropdown-item py-2 text-danger"
+                        style="background:none; border:none; width:100%;
+                               text-align:right;">
+                  <i class="bi bi-box-arrow-left me-2"></i> خروج
+                </button>
+              </form>
             </li>
           </ul>
         </li>
 
         {% else %}
 
-        <!-- دکمه‌های ورود/ثبت‌نام -->
+        <!-- ورود و ثبت‌نام -->
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'login' %}">
+          <a class="nav-link px-3" href="{% url 'login' %}">
             <i class="bi bi-box-arrow-in-right"></i> ورود
           </a>
         </li>
         <li class="nav-item">
-          <a class="btn btn-light btn-sm px-3 ms-2"
+          <a class="btn btn-light btn-sm px-3 ms-1"
              href="{% url 'register' %}">
             <i class="bi bi-person-plus"></i> ثبت‌نام
           </a>
@@ -257,7 +298,6 @@
     </div>
   </div>
 </nav>
-
 <!-- ── Messages ──────────────────────────────────────── -->
 {% if messages %}
 <div class="container mt-3">
@@ -281,15 +321,14 @@
   {% endfor %}
 </div>
 {% endif %}
-
-<!-- ── Content ───────────────────────────────────────── -->
+ <!-- ── Content ───────────────────────────────────────── -->
 <main class="container my-4">
   {% block content %}{% endblock %}
 </main>
 <!-- ── Footer ────────────────────────────────────────── -->
 <footer class="bg-white border-top mt-5 py-4">
   <div class="container">
-    <div class="row align-items-center">
+    <div class="row align-items-center">            
       <div class="col-md-6 text-center text-md-start">
         <span class="fw-bold text-primary">
           <i class="bi bi-mortarboard-fill"></i> LMS

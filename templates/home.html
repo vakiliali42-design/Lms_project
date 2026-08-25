@@ -146,21 +146,15 @@
 }
  /* ── بخش کارت‌ها ─────────────────────────────────────── */
 .features-section {
-  background: linear-gradient(180deg, #0d1b2a 0%, #0f2035 40%, #f0f4f8 40%);
-  padding: 0 0 3rem 0;
-  margin: 0 -12px;
-  border-radius: 0 0 24px 24px;
+  padding: 2.5rem 0 3rem 0;
 }
 
 .features-inner {
-  padding: 0 12px;
-  max-width: 1140px;
-  margin: 0 auto;
+  width: 100%;
 }
-
 /* کارت شیشه‌ای */
 .glass-card {
-  background: rgba(255,255,255,.08);
+  background: linear-gradient(135deg, #1a2f4a 0%, #0f2035 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,.15);
@@ -408,9 +402,10 @@
 </div>
 
 <!-- ── سه کارت شیشه‌ای ────────────────────────────────── -->
+<!-- ── سه کارت شیشه‌ای ────────────────────────────────── -->
 <div class="features-section">
   <div class="features-inner">
-    <div class="row g-4" style="padding-top: 2.5rem;">
+    <div class="row g-4" style="margin: 0 -8px;">
 
       <div class="col-md-4">
         <a href="{% url 'course_list' %}" class="glass-card card-blue">
@@ -474,7 +469,6 @@
     </div>
   </div>
 </div>
-
 <!-- ── آمار ───────────────────────────────────────────── -->
 <div class="stats-section">
   <div class="row g-3">

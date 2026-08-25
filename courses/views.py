@@ -12,8 +12,22 @@ from assignments.models import Assignment
 
 
 def course_list(request):
+    q = request.GET.get('q', '').strip()          # ← خط اضافه‌شده: خوندن عبارت جستجو از URL
     courses = Course.objects.filter(is_published=True)
-    return render(request, 'courses/list.html', {'courses': courses})
+
+    if q:                                          # ← بلوک اضافه‌شده: فیلتر کردن دوره‌ها بر اساس q
+        courses = courses.filter(
+            Q(title__icontains=q) |
+            Q(description__icontains=q) |
+            Q(level__icontains=q) |
+            Q(teacher__first_name__icontains=q) |
+            Q(teacher__last_name__icontains=q)
+        )
+
+    return render(request, 'courses/list.html', {
+        'courses': courses.select_related('teacher'),  # ← select_related اضافه شد (فقط بهینه‌سازی، اختیاریه)
+        'q': q,                                          # ← اضافه شد تا در تمپلیت هم در دسترس باشه
+    })
 
 def course_detail(request, slug):
     course   = get_object_or_404(Course, slug=slug)
