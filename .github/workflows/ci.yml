@@ -2,16 +2,32 @@ name: Django CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   test:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lms_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d lms_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -27,21 +43,36 @@ jobs:
 
       - name: Django system check
         env:
-          SECRET_KEY: "ci-test-secret-key"
-          POSTGRES_PASSWORD: testpassword
+          SECRET_KEY: ci-test-secret-key
+          DEBUG: "True"
+          DB_NAME: lms_test
+          DB_USER: postgres
+          DB_PASSWORD: testpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
         run: |
           python manage.py check
 
       - name: Check migrations
         env:
-          SECRET_KEY: "ci-test-secret-key"
-          POSTGRES_PASSWORD: testpassword
+          SECRET_KEY: ci-test-secret-key
+          DEBUG: "True"
+          DB_NAME: lms_test
+          DB_USER: postgres
+          DB_PASSWORD: testpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
         run: |
           python manage.py makemigrations --check --dry-run
 
       - name: Run tests
         env:
-          SECRET_KEY: "ci-test-secret-key"
-          POSTGRES_PASSWORD: testpassword
+          SECRET_KEY: ci-test-secret-key
+          DEBUG: "True"
+          DB_NAME: lms_test
+          DB_USER: postgres
+          DB_PASSWORD: testpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
         run: |
           python manage.py test
