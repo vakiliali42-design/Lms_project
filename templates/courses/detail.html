@@ -86,7 +86,7 @@
       </div>
     </div>
 
-    <!-- ── جلسات ── -->
+<!-- ── جلسات ── -->
     <div class="card p-4 mb-4">
       <h5>
         <i class="bi bi-play-circle text-primary"></i>
@@ -181,7 +181,7 @@
         {% endif %}
       {% endif %}
 
-      <!-- لیست نظرات -->
+<!-- لیست نظرات -->
       {% for review in reviews %}
       <div class="border-bottom py-3">
         <div class="d-flex justify-content-between align-items-start">
@@ -219,7 +219,7 @@
   </div>
 
   <!-- ── Sidebar ───────────────────────────────────────── -->
-  <div class="col-md-4">
+    <div class="col-md-4">
     <div class="card p-3 mb-3">
       <h6 class="fw-bold mb-3">اطلاعات دوره</h6>
                               <hr>
@@ -244,6 +244,32 @@
       <span class="badge bg-success">رایگان</span>
       {% endif %}
 
+      <!-- داخل sidebar — بعد از قیمت -->
+      <hr>
+      {% if course.start_date %}
+      <p>
+        <i class="bi bi-calendar-check text-success"></i>
+        شروع: <strong>{{ course.start_date|date:"Y/m/d" }}</strong>
+      </p>
+      {% endif %}
+      {% if course.end_date %}
+      <p>
+        <i class="bi bi-calendar-x text-danger"></i>
+        پایان: <strong>{{ course.end_date|date:"Y/m/d" }}</strong>
+      </p>
+      {% endif %}
+
+      <!-- وضعیت دوره -->
+      {% if course.is_active %}
+      <span class="badge bg-success w-100 py-2">
+        <i class="bi bi-circle-fill"></i> دوره فعال است
+      </span>
+      {% else %}
+      <span class="badge bg-secondary w-100 py-2">
+        <i class="bi bi-circle"></i> دوره غیرفعال است
+      </span>
+      {% endif %}
+
       <!-- دکمه پیام به استاد برای دانشجوی ثبت‌نامی -->
       {% if request.user.is_authenticated and enrolled %}
       <hr>
@@ -263,7 +289,7 @@
       {% endif %}
     </div>
 
-    <!-- فایل‌های دانشجو -->
+<!-- فایل‌های دانشجو -->
     {% if enrolled and student_contents %}
     <div class="card p-3">
       <h6 class="fw-bold">

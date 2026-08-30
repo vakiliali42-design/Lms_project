@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}دوره‌ها{% endblock %}
-
 {% block content %}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h4><i class="bi bi-collection text-primary"></i> دوره‌ها</h4>
   {% if request.user.is_authenticated and request.user.role == 'teacher' %}
@@ -26,6 +26,7 @@
   {% for course in courses %}
   <div class="col-md-4">
     <div class="card h-100">
+
       {% if course.thumbnail %}
       <img src="{{ course.thumbnail.url }}" class="card-img-top"
            style="height:180px; object-fit:cover;" alt="{{ course.title }}">
@@ -34,26 +35,52 @@
         <i class="bi bi-collection fs-1"></i>
       </div>
       {% endif %}
+
       <div class="card-body">
         <span class="badge bg-secondary mb-2">{{ course.get_level_display }}</span>
+
         <h5 class="card-title">{{ course.title }}</h5>
+
         <p class="card-text text-muted small">
           {{ course.description|truncatechars:80 }}
         </p>
-        <p class="small text-muted">
-  <i class="bi bi-person"></i>
-  <a href="{% url 'teacher_profile' course.teacher.pk %}"
-      class="text-decoration-none">
-      {{ course.teacher.get_full_name }}
-      </a>
+
+        <p class="small text-muted mb-1">
+          <i class="bi bi-person"></i>
+          <a href="{% url 'teacher_profile' course.teacher.pk %}"
+             class="text-decoration-none">
+            {{ course.teacher.get_full_name }}
+          </a>
         </p>
+
+        {% if course.start_date or course.end_date %}
+        <p class="small text-muted mb-0">
+          {% if course.start_date %}
+            <i class="bi bi-calendar-check text-success"></i>
+            {{ course.start_date|date:"Y/m/d" }}
+          {% endif %}
+
+          {% if course.start_date and course.end_date %}
+            ←
+          {% endif %}
+
+          {% if course.end_date %}
+            <i class="bi bi-calendar-x text-danger"></i>
+            {{ course.end_date|date:"Y/m/d" }}
+          {% endif %}
+        </p>
+        {% endif %}
+
       </div>
+
       <div class="card-footer bg-transparent">
         <a href="{% url 'course_detail' course.slug %}"
            class="btn btn-primary w-100">مشاهده دوره</a>
       </div>
+
     </div>
   </div>
+
   {% empty %}
   <div class="col-12 text-center text-muted py-5">
     <i class="bi bi-search fs-1"></i>
@@ -61,4 +88,5 @@
   </div>
   {% endfor %}
 </div>
+
 {% endblock %}

@@ -312,6 +312,7 @@ SIMPLE_JWT = {
 ALLOWED_HOSTS = [
     "lmsacademy.ir",
     "www.lmsacademy.ir",
+    "89.44.243.232",
 ]
 
 CSRF_TRUSTED_ORIGINS = [

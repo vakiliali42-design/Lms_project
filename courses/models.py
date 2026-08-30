@@ -19,11 +19,26 @@ class Course(models.Model):
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default="beginner")
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_published = models.BooleanField(default=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     students = models.ManyToManyField(User, through="enrollment", related_name="enrolled_course")
 
     def __str__(self):
         return self.title
+
+    @property
+    def is_active(self):
+        from django.utils import timezone
+        today = timezone.now().date()
+
+        if self.start_date and today < self.start_date:
+            return False
+
+        if self.end_date and today > self.end_date:
+            return False
+
+        return True
 
     def average_score(self):
         reviews = self.reviews.all()
