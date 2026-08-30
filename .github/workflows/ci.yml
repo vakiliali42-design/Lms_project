@@ -27,18 +27,21 @@ jobs:
 
       - name: Django system check
         env:
+          SECRET_KEY: "ci-test-secret-key"
           POSTGRES_PASSWORD: testpassword
         run: |
           python manage.py check
 
       - name: Check migrations
         env:
+          SECRET_KEY: "ci-test-secret-key"
           POSTGRES_PASSWORD: testpassword
         run: |
           python manage.py makemigrations --check --dry-run
 
       - name: Run tests
         env:
+          SECRET_KEY: "ci-test-secret-key"
           POSTGRES_PASSWORD: testpassword
         run: |
           python manage.py test
