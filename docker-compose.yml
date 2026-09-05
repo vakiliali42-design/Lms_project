@@ -1,7 +1,3 @@
-# docker-compose.yml
-
-version: '3.9'
-
 services:
 
   web:
@@ -63,7 +59,7 @@ services:
     environment:
       POSTGRES_DB:       lms_db
       POSTGRES_USER:     postgres
-      POSTGRES_PASSWORD: asd12345
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
